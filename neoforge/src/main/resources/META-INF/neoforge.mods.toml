@@ -1,0 +1,46 @@
+modLoader = "javafml" #mandatory
+loaderVersion = "${neoforge_loader_version_range}" #mandatory
+license = "${license}"
+issueTrackerURL="https://github.com/claviger/PrimalMagickExtended/issues" #optional
+
+[[mods]] #mandatory
+modId = "${mod_id}" #mandatory
+version = "${version}" #mandatory
+displayName = "${mod_name}" #mandatory
+displayURL="https://github.com/claviger/PrimalMagickExtended" #optional
+authors = "${mod_author}" #optional
+description = '''${description}''' #mandatory
+
+[[mixins]]
+config = "${mod_id}.mixins.json"
+
+[[dependencies.${mod_id}]]
+modId = "neoforge"
+type="required"
+versionRange = "[${neoforge_version},)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "minecraft"
+type="required"
+versionRange = "${minecraft_version_range}"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "commonnetworking"
+type = "required"
+versionRange = "[${common_network_version},)"
+ordering = "NONE"
+side = "BOTH"
+
+[[dependencies.${mod_id}]]
+modId = "primalmagick"
+type = "required"
+versionRange = "${primalmagick_version_range}"
+ordering = "AFTER"
+side = "BOTH"
+
+[[accessTransformers]]
+file="META-INF/accesstransformer.common.cfg"

@@ -1,0 +1,13 @@
+plugins {
+    // see https://projects.neoforged.net/neoforged/moddevgradle for new versions
+    id 'net.neoforged.moddev' version '2.0.141' apply false
+    id 'com.palantir.git-version' version '4.0.0'
+}
+
+allprojects {
+    // gitVersion() is "<tag>-<n>-g<hash>" once a release tag exists; until then it is only the commit
+    // hash, which NeoForge rejects as a mod version, so prefix it with a placeholder version.
+    // Release tags are bare like Primal Magick's ("0.1.0"); strip a stray "v" prefix if one is used anyway
+    def gitVer = gitVersion().replaceFirst(/^v(?=\d)/, '')
+    version = gitVer ==~ /^[0-9a-f]{7,}(\.dirty)?$/ ? "0.0.0-${gitVer}" : gitVer
+}

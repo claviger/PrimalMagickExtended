@@ -1,0 +1,5 @@
+{
+  "asset_id": "minecraft:entity/cat/ocelot",
+  "baby_asset_id": "minecraft:entity/cat/ocelot_baby",
+  "spawn_conditions": []
+}

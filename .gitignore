@@ -1,0 +1,34 @@
+# eclipse
+bin
+*.launch
+.settings
+.metadata
+.classpath
+.project
+
+# idea
+out
+*.ipr
+*.iws
+*.iml
+.idea/*
+.vscode
+!.idea/scopes
+
+# gradle
+build
+.gradle
+
+# other
+eclipse
+run
+runs
+
+# Generated resource caches
+neoforge/src/generated/resources/.cache/*
+
+# Local libraries
+libs/
+
+# Local design notes, not published
+docs/

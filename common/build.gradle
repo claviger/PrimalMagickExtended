@@ -1,0 +1,85 @@
+plugins {
+    id 'multiloader-common'
+    id 'net.neoforged.moddev'
+}
+
+neoForge {
+    neoFormVersion = neo_form_version
+    // Automatically enable AccessTransformers if the file exists
+    def at = file('src/main/resources/META-INF/accesstransformer.common.cfg')
+    if (at.exists()) {
+        accessTransformers.from(at.absolutePath)
+    }
+}
+
+// Primal Magick common jar, built in the PM checkout; exactly one must be present
+def pmCommonLibsDir = "${primalmagick_dir}/common/build/libs"
+def pmCommonJars = fileTree(dir: pmCommonLibsDir, include: 'primalmagick-common-*.jar', exclude: ['*-sources.jar', '*-javadoc.jar'])
+
+dependencies {
+    compileOnly group: 'org.spongepowered', name: 'mixin', version: '0.8.5'
+    // fabric and neoforge both bundle mixinextras, so it is safe to use it in common
+    compileOnly group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.5.3'
+    annotationProcessor group: 'io.github.llamalad7', name: 'mixinextras-common', version: '0.5.3'
+
+    // Common API for JEI compatibility
+    compileOnly "mezz.jei:jei-${minecraft_version}-common-api:${jei_version}"
+
+    // Common Networking
+    implementation "mysticdrew:common-networking-common:${common_network_version}-${common_network_mc_version}"
+
+    // Primal Magick common classes (vanilla-only), built in the PM checkout
+    compileOnly pmCommonJars
+}
+
+// Fail clearly, rather than with missing classes or a duplicate mod, unless exactly one PM jar matched.
+// Only local values are captured so that the check works under the configuration cache.
+tasks.named('compileJava') {
+    def jars = pmCommonJars
+    def libsDir = pmCommonLibsDir
+    def pmDir = primalmagick_dir
+    doFirst {
+        def found = jars.files
+        if (found.isEmpty()) {
+            throw new GradleException("No Primal Magick common jar found in ${libsDir}. Build Primal Magick first: cd ${pmDir} && ./gradlew clean :common:jar :neoforge:jar --no-configuration-cache")
+        }
+        if (found.size() > 1) {
+            throw new GradleException("Found ${found.size()} Primal Magick common jars in ${libsDir}: ${found*.name.sort().join(', ')}. Run `cd ${pmDir} && ./gradlew clean :common:jar :neoforge:jar --no-configuration-cache` so exactly one jar remains.")
+        }
+    }
+}
+
+configurations {
+    commonJava {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+    commonResources {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+}
+
+artifacts {
+    commonJava sourceSets.main.java.sourceDirectories.singleFile
+    commonResources sourceSets.main.resources.sourceDirectories.singleFile
+}
+
+// Implement mcgradleconventions loader attribute
+def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
+['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements'].each { variant ->
+    configurations.named("$variant") {
+        attributes {
+            attribute(loaderAttribute, 'common')
+        }
+    }
+}
+sourceSets.configureEach {
+    [it.compileClasspathConfigurationName, it.runtimeClasspathConfigurationName].each { variant->
+        configurations.named("$variant") {
+            attributes {
+                attribute(loaderAttribute, 'common')
+            }
+        }
+    }
+}

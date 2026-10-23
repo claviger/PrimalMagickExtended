@@ -1,0 +1,46 @@
+{
+  "addenda": [],
+  "disciplineKey": {
+    "rootKey": "primalmagick:sorcery"
+  },
+  "finales": [],
+  "flags": {
+    "finaleExempt": true
+  },
+  "icon": {
+    "location": "primalmagick:textures/gui/sprites/sources/blood.png"
+  },
+  "key": {
+    "rootKey": "primalmagickextended:find_familiar"
+  },
+  "parents": [
+    {
+      "rootKey": "primalmagickextended:familiar_collar"
+    }
+  ],
+  "stages": [
+    {
+      "completionRequirementOpt": {
+        "amount": 2,
+        "knowledgeType": "theory",
+        "requirement_type": "primalmagick:knowledge"
+      },
+      "parentKey": {
+        "rootKey": "primalmagickextended:find_familiar"
+      },
+      "recipes": [],
+      "revelations": [],
+      "siblings": [],
+      "textTranslationKey": "research.primalmagickextended.find_familiar.text.stage.1"
+    },
+    {
+      "parentKey": {
+        "rootKey": "primalmagickextended:find_familiar"
+      },
+      "recipes": [],
+      "revelations": [],
+      "siblings": [],
+      "textTranslationKey": "research.primalmagickextended.find_familiar.text.stage.2"
+    }
+  ]
+}

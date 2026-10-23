@@ -1,0 +1,71 @@
+{
+  "addenda": [],
+  "disciplineKey": {
+    "rootKey": "primalmagick:ritual"
+  },
+  "finales": [],
+  "flags": {
+    "finaleExempt": true
+  },
+  "icon": {
+    "isItem": true,
+    "location": "primalmagickextended:familiar_collar"
+  },
+  "key": {
+    "rootKey": "primalmagickextended:familiar_collar"
+  },
+  "parents": [
+    {
+      "rootKey": "primalmagick:expert_ritual"
+    },
+    {
+      "rootKey": "primalmagick:rune_summon"
+    },
+    {
+      "rootKey": "primalmagick:rune_creature"
+    },
+    {
+      "rootKey": "primalmagick:rune_infernal"
+    },
+    {
+      "rootKey": "primalmagick:spell_payload_polymorph"
+    },
+    {
+      "rootKey": "primalmagick:spell_payload_healing"
+    },
+    {
+      "rootKey": "primalmagick:incense_brazier"
+    },
+    {
+      "rootKey": "primalmagick:ritual_bell"
+    }
+  ],
+  "stages": [
+    {
+      "completionRequirementOpt": {
+        "amount": 1,
+        "knowledgeType": "theory",
+        "requirement_type": "primalmagick:knowledge"
+      },
+      "parentKey": {
+        "rootKey": "primalmagickextended:familiar_collar"
+      },
+      "recipes": [],
+      "revelations": [],
+      "siblings": [],
+      "textTranslationKey": "research.primalmagickextended.familiar_collar.text.stage.1"
+    },
+    {
+      "parentKey": {
+        "rootKey": "primalmagickextended:familiar_collar"
+      },
+      "recipes": [
+        "primalmagickextended:familiar_collar"
+      ],
+      "revelations": [],
+      "siblings": [],
+      "textTranslationKey": "research.primalmagickextended.familiar_collar.text.stage.2"
+    }
+  ],
+  "tier": "primalmagick:expert"
+}

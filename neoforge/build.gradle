@@ -1,0 +1,99 @@
+plugins {
+    id 'multiloader-loader'
+    id 'net.neoforged.moddev'
+}
+
+neoForge {
+    version = neoforge_version
+    // Automatically enable neoforge AccessTransformers if the file exists
+    def at = project(':common').file('src/main/resources/META-INF/accesstransformer.common.cfg')
+    if (at.exists()) {
+        accessTransformers.from(at.absolutePath)
+    }
+    runs {
+        configureEach {
+            ideName = "NeoForge ${it.name.capitalize()} (${project.path})"
+        }
+        client {
+            client()
+            gameDirectory = this.mkdir(this.file("runs/client"))
+            programArguments.addAll '--quickPlaySingleplayer', 'PMX Debug'
+        }
+        data {
+            clientData()
+            gameDirectory = this.mkdir(this.file("runs/data"))
+            // DataGen can be run by - "./gradlew :neoforge:runData" in Terminal.
+            programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', rootProject.file('common/src/main/resources/').getAbsolutePath()
+        }
+        server {
+            server()
+            this.file("runs/server").createParentDirectories()
+            gameDirectory = this.mkdir(this.file("runs/server"))
+        }
+        gameTestServer {
+            type = "gameTestServer"
+            // NeoForge 26.1 ignores neoforge.enabledGameTestNamespaces; vanilla's --tests selector filters instead
+            programArguments.addAll '--tests', "${mod_id}:*"
+        }
+    }
+    mods {
+        "${mod_id}" {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+// Primal Magick NeoForge jar, built in the PM checkout; exactly one must be present
+def pmNeoforgeLibsDir = "${primalmagick_dir}/neoforge/build/libs"
+def pmNeoforgeJars = fileTree(dir: pmNeoforgeLibsDir, include: 'primalmagick-neoforge-*.jar', exclude: ['*-sources.jar', '*-javadoc.jar'])
+
+dependencies {
+    // compile against the JEI API but do not include it at runtime
+    compileOnly("mezz.jei:jei-${minecraft_version}-neoforge-api:${jei_version}")
+    // at runtime, use the full JEI jar for NeoForge, as Primal Magick's dev runs do
+    runtimeOnly("mezz.jei:jei-${minecraft_version}-neoforge:${jei_version}")
+
+    // Common Networking (required by Primal Magick at runtime)
+    implementation "mysticdrew:common-networking-neoforge:${common_network_version}-${common_network_mc_version}"
+
+    // Primal Magick itself (self-contained NeoForge jar built in the PM checkout); loaded as a mod in dev runs
+    implementation pmNeoforgeJars
+}
+
+// Fail clearly, rather than with missing classes or a duplicate mod, unless exactly one PM jar matched.
+// Only local values are captured so that the check works under the configuration cache.
+tasks.named('compileJava') {
+    def jars = pmNeoforgeJars
+    def libsDir = pmNeoforgeLibsDir
+    def pmDir = primalmagick_dir
+    doFirst {
+        def found = jars.files
+        if (found.isEmpty()) {
+            throw new GradleException("No Primal Magick neoforge jar found in ${libsDir}. Build Primal Magick first: cd ${pmDir} && ./gradlew clean :common:jar :neoforge:jar --no-configuration-cache")
+        }
+        if (found.size() > 1) {
+            throw new GradleException("Found ${found.size()} Primal Magick neoforge jars in ${libsDir}: ${found*.name.sort().join(', ')}. Run `cd ${pmDir} && ./gradlew clean :common:jar :neoforge:jar --no-configuration-cache` so exactly one jar remains.")
+        }
+    }
+}
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+// Implement mcgradleconventions loader attribute
+def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)
+['apiElements', 'runtimeElements', 'sourcesElements', 'javadocElements'].each { variant ->
+    configurations.named("$variant") {
+        attributes {
+            attribute(loaderAttribute, 'neoforge')
+        }
+    }
+}
+sourceSets.configureEach {
+    [it.compileClasspathConfigurationName, it.runtimeClasspathConfigurationName, it.getTaskName(null, 'jarJar')].each { variant ->
+        configurations.named("$variant") {
+            attributes {
+                attribute(loaderAttribute, 'neoforge')
+            }
+        }
+    }
+}
