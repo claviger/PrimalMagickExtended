@@ -1,6 +1,7 @@
 package com.claviger.primalmagickextended.test;
 
 import com.claviger.primalmagickextended.platform.ServicesPMX;
+import com.claviger.primalmagickextended.test.affinities.GeneratedAffinityTests;
 import com.claviger.primalmagickextended.test.familiars.FamiliarCollarTests;
 import com.claviger.primalmagickextended.test.familiars.FamiliarCommandTests;
 import com.claviger.primalmagickextended.test.familiars.FamiliarDataTests;
@@ -172,6 +173,9 @@ public class TestFunctionsPMX {
     public static final IRegistryItem<Consumer<GameTestHelper>, Consumer<GameTestHelper>> STALE_RESEARCH_AND_RECIPE_KEYS_ARE_HARMLESS = register("stale_research_and_recipe_keys_are_harmless", FeatureToggleTests::stale_research_and_recipe_keys_are_harmless);
     public static final IRegistryItem<Consumer<GameTestHelper>, Consumer<GameTestHelper>> STALE_GRIMOIRE_TOPICS_ARE_CLEARED = register("stale_grimoire_topics_are_cleared", FeatureToggleTests::stale_grimoire_topics_are_cleared);
     public static final IRegistryItem<Consumer<GameTestHelper>, Consumer<GameTestHelper>> FIND_FAMILIAR_PAYLOAD_NEEDS_ITS_ENTRY_LOADED = register("find_familiar_payload_needs_its_entry_loaded", FeatureToggleTests::find_familiar_payload_needs_its_entry_loaded);
+    public static final IRegistryItem<Consumer<GameTestHelper>, Consumer<GameTestHelper>> GENERATED_AFFINITIES_ARE_REGISTERED_AND_YIELD_TO_DATA = register("generated_affinities_are_registered_and_yield_to_data", GeneratedAffinityTests::generated_affinities_are_registered_and_yield_to_data);
+    public static final IRegistryItem<Consumer<GameTestHelper>, Consumer<GameTestHelper>> ROUNDED_DOWN_CRAFTS_OF_GENERATED_ITEMS_GET_ONE_OF_EACH_SOURCE = register("rounded_down_crafts_of_generated_items_get_one_of_each_source", GeneratedAffinityTests::rounded_down_crafts_of_generated_items_get_one_of_each_source);
+    public static final IRegistryItem<Consumer<GameTestHelper>, Consumer<GameTestHelper>> LINT_STILL_LISTS_ITEMS_WITH_ONLY_A_GENERATED_AFFINITY = register("lint_still_lists_items_with_only_a_generated_affinity", GeneratedAffinityTests::lint_still_lists_items_with_only_a_generated_affinity);
 
     private static IRegistryItem<Consumer<GameTestHelper>, Consumer<GameTestHelper>> register(String name, Consumer<GameTestHelper> function) {
         return ServicesPMX.TEST_FUNCTIONS_REGISTRY.register(name, () -> function);

@@ -152,6 +152,9 @@ public class TestInstancesPMX {
     public static final ResourceKey<GameTestInstance> STALE_RESEARCH_AND_RECIPE_KEYS_ARE_HARMLESS = createInstanceKey("stale_research_and_recipe_keys_are_harmless");
     public static final ResourceKey<GameTestInstance> STALE_GRIMOIRE_TOPICS_ARE_CLEARED = createInstanceKey("stale_grimoire_topics_are_cleared");
     public static final ResourceKey<GameTestInstance> FIND_FAMILIAR_PAYLOAD_NEEDS_ITS_ENTRY_LOADED = createInstanceKey("find_familiar_payload_needs_its_entry_loaded");
+    public static final ResourceKey<GameTestInstance> GENERATED_AFFINITIES_ARE_REGISTERED_AND_YIELD_TO_DATA = createInstanceKey("generated_affinities_are_registered_and_yield_to_data");
+    public static final ResourceKey<GameTestInstance> ROUNDED_DOWN_CRAFTS_OF_GENERATED_ITEMS_GET_ONE_OF_EACH_SOURCE = createInstanceKey("rounded_down_crafts_of_generated_items_get_one_of_each_source");
+    public static final ResourceKey<GameTestInstance> LINT_STILL_LISTS_ITEMS_WITH_ONLY_A_GENERATED_AFFINITY = createInstanceKey("lint_still_lists_items_with_only_a_generated_affinity");
 
     // Test functions registered by the NeoForge module (TestFunctionsPMXNeoforge), which this module refers to by name
     public static final String FEATURE_CONDITION_FOLLOWS_CONFIG_FUNCTION = "feature_condition_follows_config";
@@ -299,6 +302,9 @@ public class TestInstancesPMX {
         registerFunction(context, STALE_RESEARCH_AND_RECIPE_KEYS_ARE_HARMLESS, TestFunctionsPMX.STALE_RESEARCH_AND_RECIPE_KEYS_ARE_HARMLESS.getKey());
         registerFunction(context, STALE_GRIMOIRE_TOPICS_ARE_CLEARED, TestFunctionsPMX.STALE_GRIMOIRE_TOPICS_ARE_CLEARED.getKey());
         registerFunction(context, FIND_FAMILIAR_PAYLOAD_NEEDS_ITS_ENTRY_LOADED, TestFunctionsPMX.FIND_FAMILIAR_PAYLOAD_NEEDS_ITS_ENTRY_LOADED.getKey());
+        registerFunction(context, GENERATED_AFFINITIES_ARE_REGISTERED_AND_YIELD_TO_DATA, TestFunctionsPMX.GENERATED_AFFINITIES_ARE_REGISTERED_AND_YIELD_TO_DATA.getKey());
+        registerFunction(context, ROUNDED_DOWN_CRAFTS_OF_GENERATED_ITEMS_GET_ONE_OF_EACH_SOURCE, TestFunctionsPMX.ROUNDED_DOWN_CRAFTS_OF_GENERATED_ITEMS_GET_ONE_OF_EACH_SOURCE.getKey());
+        registerFunction(context, LINT_STILL_LISTS_ITEMS_WITH_ONLY_A_GENERATED_AFFINITY, TestFunctionsPMX.LINT_STILL_LISTS_ITEMS_WITH_ONLY_A_GENERATED_AFFINITY.getKey());
         registerFunction(context, FEATURE_CONDITION_FOLLOWS_CONFIG, functionKey(FEATURE_CONDITION_FOLLOWS_CONFIG_FUNCTION));
         registerFunction(context, FEATURE_CONDITION_KEEPS_ENTRIES_LISTED_BY_SERVER, functionKey(FEATURE_CONDITION_KEEPS_ENTRIES_LISTED_BY_SERVER_FUNCTION));
         registerFunction(context, FEATURE_CONDITION_ROUND_TRIPS_THROUGH_CODEC, functionKey(FEATURE_CONDITION_ROUND_TRIPS_THROUGH_CODEC_FUNCTION));

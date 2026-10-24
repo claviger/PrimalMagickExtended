@@ -7,11 +7,12 @@ import org.jetbrains.annotations.NotNull;
 /**
  * A whole feature of the mod that the common config can switch off. A disabled feature's research entries and
  * recipes are not loaded, so they never appear in the Grimoire or in any recipe book; its blocks, items and
- * entities stay registered.
+ * entities stay registered. Generated affinities have none of these; switching them off stops the generation.
  */
 public enum FeaturePMX implements StringRepresentable {
     FAMILIARS("familiars"),
-    PORTALS("portals");
+    PORTALS("portals"),
+    GENERATED_AFFINITIES("generated_affinities");
 
     public static final Codec<FeaturePMX> CODEC = StringRepresentable.fromEnum(FeaturePMX::values);
 

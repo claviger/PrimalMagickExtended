@@ -4,7 +4,7 @@
   "package": "com.claviger.primalmagickextended.mixin",
   "refmap": "${mod_id}.refmap.json",
   "compatibilityLevel": "JAVA_21",
-  "mixins": ["IManaContainerMixin", "EntityMixin", "OcelotCatNameMixin"],
+  "mixins": ["IManaContainerMixin", "EntityMixin", "OcelotCatNameMixin", "PrimalMagickCommandMixin"],
   "client": ["client.LocalPlayerMixin", "client.GuiMixin", "client.LevelLoadingScreenMixin", "client.LevelEventHandlerMixin"],
   "server": [],
   "injectors": {

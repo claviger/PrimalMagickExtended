@@ -1,3 +1,11 @@
+v0.3.0
+------
+* Added Generated Affinities: natural blocks without a Primal Magick affinity (such as those of biome mods) get one worked out from what they are and where world generation puts them, regenerated at start-up and on /reload
+* Slabs, buttons and other blocks crafted from generated-affinity blocks that Primal Magick's recipe scan rounds down to nothing get 1 of each source of their ingredients
+* Each run writes a report of the generated affinities and their reasons, and the entries in data pack format, to primalmagickextended/ in the game directory
+* Primal Magick's /pm affinities lint and generateDatapack still list items that only have a generated affinity, and /pm affinities explain reports generated affinities as such
+* Generated affinities can be turned off with generated_affinities in the common config's [features] section
+
 v0.2.0
 ------
 * Added Portal Travel (Manaweaving, expert tier): craft Portal Catalysts at the Arcane Workbench and use one inside a closed frame of any single block to open a coloured portal

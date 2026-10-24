@@ -61,6 +61,7 @@ public final class ConfigPMXNeoforge {
                 .push(CATEGORY_FEATURES);
         defineFeature(builder, FeaturePMX.FAMILIARS, "Familiar Collar ritual and Find Familiar spell.");
         defineFeature(builder, FeaturePMX.PORTALS, "Portal catalysts and portal runes.");
+        defineFeature(builder, FeaturePMX.GENERATED_AFFINITIES, "Affinities worked out for natural blocks (such as those of biome mods) that have none.");
         builder.pop();
 
         COMMON_SPEC = builder.build();
