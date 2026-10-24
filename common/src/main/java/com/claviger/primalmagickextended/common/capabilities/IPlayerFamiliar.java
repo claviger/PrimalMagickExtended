@@ -25,7 +25,7 @@ public interface IPlayerFamiliar {
     /** True if the player has a bound familiar, whether in play or dismissed. Works on both sides. */
     boolean hasFamiliar();
 
-    /** True while the familiar is in play within 100 blocks of the player. Works on both sides. */
+    /** True while the familiar is in play within {@link com.claviger.primalmagickextended.common.familiars.FamiliarManager#NEARBY_RANGE} (32) blocks of the player. Works on both sides. */
     boolean isFamiliarNearby();
 
     /**

@@ -39,11 +39,7 @@ public class OcelotConversion {
         Cat cat = ocelot.convertTo(EntityType.CAT, ConversionParams.single(ocelot, false, false), EntitySpawnReason.CONVERSION, converted -> {
             converted.setComponent(DataComponents.CAT_VARIANT, variant);
             converted.tame(player);
-            // An unnamed ocelot must not turn into a cat called "Cat": keep calling it an ocelot, without a floating nameplate
-            if (converted.getCustomName() == null) {
-                converted.setCustomName(EntityType.OCELOT.getDescription());
-                converted.setCustomNameVisible(false);
-            }
+            // The Ocelot variant alone keeps an unnamed cat called an ocelot (see OcelotCatNameMixin), without the nameplate a custom name would show
         });
         // convertTo ignores whether the level accepted the new entity
         if (cat == null || level.getEntity(cat.getUUID()) != cat) {

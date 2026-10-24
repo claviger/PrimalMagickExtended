@@ -17,7 +17,7 @@ This mod targets the Minecraft 26.1 port of Primal Magick at https://github.com/
   is absent and dismisses it if it is present, with Polymorph's animation and sound.
 - A familiar can never be hurt: any damage dismisses it instead, with no drops. Its name, collar and data
   travel with you, across death, dimensions and relogs.
-- While your familiar is in play within 100 blocks, you gain a modest mana discount of about five percent (a little over two levels of Mana Efficiency).
+- While your familiar is in play within 32 blocks, you gain a modest mana discount of about five percent (a little over two levels of Mana Efficiency).
 - You keep one familiar at a time; binding another releases the first unharmed as an ordinary pet.
 
 Everything is documented in the Grimoire.

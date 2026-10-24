@@ -18,10 +18,15 @@ jobs:
         ref: port26integration
         path: PrimalMagick
         fetch-depth: 0
+    # The fork carries no release tags, and Primal Magick's version comes from git describe; without the upstream
+    # tags it is a bare commit hash, which NeoForge rejects, so this mod's [6.0.7,) dependency fails
+    - name: Fetch Primal Magick release tags
+      working-directory: ./PrimalMagick
+      run: git fetch --tags https://github.com/daedalus4096/PrimalMagick.git
     - uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: 21
+        java-version: 25
     - uses: gradle/actions/setup-gradle@v4
     - name: Build Primal Magick jars
       working-directory: ./PrimalMagick

@@ -78,6 +78,8 @@ tasks.named('compileJava') {
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
+// The datagen hash cache lives beside the generated resources; keep it out of the jar
+tasks.named('processResources', ProcessResources) { exclude '.cache/**' }
 
 // Implement mcgradleconventions loader attribute
 def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)

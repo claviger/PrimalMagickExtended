@@ -179,10 +179,12 @@ public class FamiliarCollarTests extends AbstractBaseTest {
         Ocelot ocelot = helper.spawnWithNoFreeWill(EntityType.OCELOT, PET_POS);
         assertTrue(helper, useCollar(player, ocelot), "Interaction was not consumed");
         Cat cat = convertedCat(helper);
-        assertTrue(helper, cat.getCustomName() != null, "Unnamed ocelot's cat has no name");
-        assertValueEqual(helper, EntityType.OCELOT.getDescription().getString(), cat.getCustomName().getString(), "Unnamed ocelot's cat name");
+        // No custom name, so no nameplate when looked at; the Ocelot variant supplies the name
+        assertFalse(helper, cat.hasCustomName(), "Unnamed ocelot's cat was given a custom name");
+        assertValueEqual(helper, EntityType.OCELOT.getDescription().getString(), cat.getName().getString(), "Unnamed ocelot's cat name");
         assertValueEqual(helper, EntityType.OCELOT.getDescription().getString(), cat.getDisplayName().getString(), "Unnamed ocelot's cat display name");
-        assertFalse(helper, cat.isCustomNameVisible(), "Default name shows a floating nameplate");
+        Cat ordinaryCat = helper.spawnWithNoFreeWill(EntityType.CAT, PET_POS.add(1, 0, 0));
+        assertValueEqual(helper, EntityType.CAT.getDescription().getString(), ordinaryCat.getName().getString(), "Ordinary cat name");
         helper.succeed();
     }
 
