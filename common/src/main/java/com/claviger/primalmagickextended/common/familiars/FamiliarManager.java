@@ -8,24 +8,20 @@ import com.verdantartifice.primalmagick.common.misc.EntitySwapper;
 import com.verdantartifice.primalmagick.platform.Services;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -81,13 +77,9 @@ public class FamiliarManager {
      * passengers: a familiar's riders are never part of the familiar.
      */
     public static CompoundTag snapshot(Mob mob) {
-        try (ProblemReporter.ScopedCollector problems = new ProblemReporter.ScopedCollector(LOGGER)) {
-            TagValueOutput out = TagValueOutput.createWithContext(problems, mob.registryAccess());
-            mob.saveWithoutId(out);
-            CompoundTag tag = out.buildResult();
-            tag.remove("Passengers");
-            return tag;
-        }
+        CompoundTag tag = mob.saveWithoutId(new CompoundTag());
+        tag.remove(Entity.PASSENGERS_TAG);
+        return tag;
     }
 
     /** Finds a loaded, live mob with the given UUID in any level of the server. */
@@ -103,7 +95,7 @@ public class FamiliarManager {
     /** The player's in-play familiar entity, or empty if dismissed or not loaded. */
     public static Optional<Mob> findActive(ServerPlayer player) {
         return data(player).flatMap(IPlayerFamiliar::getStored).flatMap(StoredFamiliar::activeEntityId)
-                .flatMap(uuid -> findEntity(player.level().getServer(), uuid));
+                .flatMap(uuid -> findEntity(player.server, uuid));
     }
 
     /**
@@ -172,7 +164,7 @@ public class FamiliarManager {
                 return true;
             }
             // A recreated pet must never join the level carrying a binding
-            if (!addFamiliar(player.level(), mob, FamiliarManager::unbind)) {
+            if (!addFamiliar(player.serverLevel(), mob, FamiliarManager::unbind)) {
                 player.sendSystemMessage(FamiliarMessages.summonFailed());
                 return false;
             }
@@ -215,7 +207,8 @@ public class FamiliarManager {
             mob.stopRiding();
         }
         if (mob.isLeashed()) {
-            mob.dropLeash();
+            // Drops the lead, as a leash broken any other way would
+            mob.dropLeash(true, true);
         }
         familiar.setStored(Optional.of(new StoredFamiliar(mob.getType(), snapshot(mob), stored.generation(), Optional.empty())));
         familiar.setFamiliarNearby(false);
@@ -250,7 +243,7 @@ public class FamiliarManager {
         StoredFamiliar stored = familiar.getStored().get();
         UUID generation = UUID.randomUUID();
         Optional<Mob> mob = loadFamiliar(player, stored);
-        boolean added = mob.isPresent() && addFamiliar(player.level(), mob.get(), m -> {
+        boolean added = mob.isPresent() && addFamiliar(player.serverLevel(), mob.get(), m -> {
             // The binding and the stored generation must agree before the entity joins the level,
             // or the join handler would treat it as a stale copy
             FamiliarBinding binding = new FamiliarBinding(player.getUUID(), generation);
@@ -273,7 +266,7 @@ public class FamiliarManager {
      * {@link #TOGGLE_DEBOUNCE_TICKS} ticks of the player's previous one is ignored, so toggles that arrive
      * together (such as the projectiles of one forked cast) are collapsed into one.
      * A parrot familiar on the player's shoulder is put back into the world first, but
-     * {@code ServerPlayer.removeEntitiesOnShoulder} ignores parrots that landed less than 20 ticks
+     * {@code Player.removeEntitiesOnShoulder} ignores parrots that landed less than 20 ticks
      * ago; a toggle in that window summons a second parrot, and the shoulder copy is discarded as
      * stale when it hops off.
      */
@@ -282,7 +275,7 @@ public class FamiliarManager {
         if (familiar == null) {
             return;
         }
-        long now = player.level().getGameTime();
+        long now = player.serverLevel().getGameTime();
         long last = familiar.getLastToggleGameTime();
         if (last >= 0L && now >= last && now - last < TOGGLE_DEBOUNCE_TICKS) {
             return;
@@ -331,7 +324,7 @@ public class FamiliarManager {
             return;
         }
         Optional<UUID> activeId = familiar.getStored().get().activeEntityId();
-        boolean nearby = activeId.isPresent() && (isOnShoulder(player, activeId.get()) || Optional.ofNullable(player.level().getEntity(activeId.get()))
+        boolean nearby = activeId.isPresent() && (isOnShoulder(player, activeId.get()) || Optional.ofNullable(player.serverLevel().getEntity(activeId.get()))
                 .filter(entity -> entity instanceof Mob && !entity.isRemoved() && entity.distanceToSqr(player) <= NEARBY_RANGE_SQR)
                 .isPresent());
         if (nearby != familiar.isFamiliarNearby()) {
@@ -348,11 +341,11 @@ public class FamiliarManager {
 
     /**
      * True if either shoulder holds the entity with the given UUID. Shoulder tags are full saves that
-     * keep the entity's UUID, which {@code ServerPlayer.respawnEntityOnShoulder} restores via addWithUUID.
+     * keep the entity's UUID, which {@code Player.respawnEntityOnShoulder} restores via addWithUUID.
      */
     private static boolean isOnShoulder(ServerPlayer player, UUID uuid) {
         return Stream.of(player.getShoulderEntityLeft(), player.getShoulderEntityRight())
-                .anyMatch(tag -> tag.read("UUID", UUIDUtil.CODEC).filter(uuid::equals).isPresent());
+                .anyMatch(tag -> tag.hasUUID(Entity.UUID_TAG) && tag.getUUID(Entity.UUID_TAG).equals(uuid));
     }
 
     private static boolean mayBePerched(ServerPlayer player, IPlayerFamiliar familiar) {
@@ -402,9 +395,8 @@ public class FamiliarManager {
         boolean changed = false;
         for (EntitySwapper swapper : swappers.getQueue()) {
             CompoundTag swapperTag = swapper.serializeNBT(registries);
-            Optional<CompoundTag> originalData = swapperTag.getCompound(SWAPPER_ORIGINAL_DATA_KEY);
             // Swappers share their original data with the swap-backs they queue; never edit it in place
-            CompoundTag data = originalData.map(CompoundTag::copy).orElse(null);
+            CompoundTag data = swapperTag.contains(SWAPPER_ORIGINAL_DATA_KEY, Tag.TAG_COMPOUND) ? swapperTag.getCompound(SWAPPER_ORIGINAL_DATA_KEY).copy() : null;
             if (data == null || !setBinding(data, encoded)) {
                 rewritten.offer(swapper);
                 continue;
@@ -424,7 +416,8 @@ public class FamiliarManager {
      * @return true if the save was changed
      */
     private static boolean setBinding(CompoundTag entityData, Optional<Tag> encodedBinding) {
-        CompoundTag attachments = entityData.getCompoundOrEmpty(ATTACHMENTS_KEY);
+        // Empty and detached from the save if it has no attachments yet
+        CompoundTag attachments = entityData.getCompound(ATTACHMENTS_KEY);
         if (encodedBinding.isPresent()) {
             attachments.put(BINDING_ATTACHMENT_KEY, encodedBinding.get().copy());
             entityData.put(ATTACHMENTS_KEY, attachments);
@@ -448,8 +441,11 @@ public class FamiliarManager {
      * @return the prepared mob, or empty if the snapshot cannot produce a mob
      */
     private static Optional<Mob> loadFamiliar(ServerPlayer player, StoredFamiliar stored) {
-        ServerLevel level = player.level();
-        Entity entity = EntityType.loadEntityRecursive(stored.type(), stored.entityData(), level, EntitySpawnReason.MOB_SUMMONED, loaded -> {
+        ServerLevel level = player.serverLevel();
+        // The snapshot was saved without its id, which loading needs to pick the entity type
+        CompoundTag entityData = stored.entityData().copy();
+        entityData.putString(Entity.ID_TAG, EntityType.getKey(stored.type()).toString());
+        Entity entity = EntityType.loadEntityRecursive(entityData, level, loaded -> {
             // The snapshot carries the old UUID; a fresh one keeps the level from rejecting a duplicate
             loaded.setUUID(UUID.randomUUID());
             return loaded;
@@ -463,7 +459,7 @@ public class FamiliarManager {
         mob.setYHeadRot(yaw);
         mob.setYBodyRot(yaw);
         mob.setDeltaMovement(Vec3.ZERO);
-        mob.fallDistance = 0.0D;
+        mob.fallDistance = 0.0F;
         mob.clearFire();
         mob.setTicksFrozen(0);
         mob.setAirSupply(mob.getMaxAirSupply());
@@ -518,13 +514,13 @@ public class FamiliarManager {
                     if (radius > 0 && dx == 0 && dz == 0) {
                         continue;
                     }
-                    mob.absSnapTo(pos.x + dx, pos.y, pos.z + dz, yaw, 0.0F);
+                    mob.absMoveTo(pos.x + dx, pos.y, pos.z + dz, yaw, 0.0F);
                     if (level.noCollision(mob)) {
                         return;
                     }
                 }
             }
         }
-        mob.absSnapTo(pos.x, pos.y, pos.z, yaw, 0.0F);
+        mob.absMoveTo(pos.x, pos.y, pos.z, yaw, 0.0F);
     }
 }

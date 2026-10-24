@@ -3,21 +3,19 @@ package com.claviger.primalmagickextended.platform.registries;
 import com.claviger.primalmagickextended.PrimalMagickExtended;
 import com.mojang.serialization.Codec;
 import com.verdantartifice.primalmagick.common.registries.IRegistryItem;
-import com.verdantartifice.primalmagick.common.registries.RegistryIdContext;
 import com.verdantartifice.primalmagick.common.registries.RegistryItemNeoforge;
 import com.verdantartifice.primalmagick.common.tags.ITagValue;
 import com.verdantartifice.primalmagick.common.tags.TagValueNeoforge;
 import com.verdantartifice.primalmagick.platform.services.registries.IRegistryService;
+import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.Utf8String;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.Nullable;
@@ -47,27 +45,12 @@ abstract class AbstractRegistryServicePMXNeoforge<R> implements IRegistryService
 
     @Override
     public <T extends R> IRegistryItem<R, T> register(String name, Supplier<T> supplier) {
-        return new RegistryItemNeoforge<>(this.getDeferredRegisterSupplier().get().register(name, id -> this.construct(id, supplier)));
-    }
-
-    /**
-     * Construct the value being registered under the given ID. Blocks and items need their registry key available
-     * while their properties are built, so the key is exposed to them for the duration of the supplier call.
-     */
-    protected <T extends R> T construct(Identifier id, Supplier<T> supplier) {
-        Registry<R> registry = this.getRegistry();
-        if (registry == BuiltInRegistries.BLOCK) {
-            return RegistryIdContext.withBlockKey(ResourceKey.create(Registries.BLOCK, id), supplier);
-        } else if (registry == BuiltInRegistries.ITEM) {
-            return RegistryIdContext.withItemKey(ResourceKey.create(Registries.ITEM, id), supplier);
-        } else {
-            return supplier.get();
-        }
+        return new RegistryItemNeoforge<>(this.getDeferredRegisterSupplier().get().register(name, supplier));
     }
 
     @Override
-    public @Nullable R get(Identifier id) {
-        return this.getRegistry().getValue(id);
+    public @Nullable R get(ResourceLocation id) {
+        return this.getRegistry().get(id);
     }
 
     @Override
@@ -76,7 +59,7 @@ abstract class AbstractRegistryServicePMXNeoforge<R> implements IRegistryService
     }
 
     @Override
-    public Set<Identifier> getAllKeys() {
+    public Set<ResourceLocation> getAllKeys() {
         return this.getRegistry().keySet();
     }
 
@@ -86,13 +69,28 @@ abstract class AbstractRegistryServicePMXNeoforge<R> implements IRegistryService
     }
 
     @Override
-    public boolean containsKey(Identifier id) {
+    public boolean containsKey(ResourceLocation id) {
         return this.getRegistry().containsKey(id);
     }
 
     @Override
     public Optional<ResourceKey<R>> getResourceKey(R value) {
         return this.getRegistry().getResourceKey(value);
+    }
+
+    @Override
+    public Optional<Holder<R>> getHolder(ResourceKey<R> key) {
+        return this.getRegistry().getHolder(key).flatMap(Optional::of);
+    }
+
+    @Override
+    public Optional<Holder<R>> getHolder(ResourceLocation loc) {
+        return this.getRegistry().getHolder(loc).flatMap(Optional::of);
+    }
+
+    @Override
+    public Optional<Holder<R>> getHolder(R value) {
+        return this.getRegistry().getResourceKey(value).flatMap(this::getHolder);
     }
 
     @Override
@@ -110,20 +108,25 @@ abstract class AbstractRegistryServicePMXNeoforge<R> implements IRegistryService
         return new StreamCodec<>() {
             @Override
             public R decode(FriendlyByteBuf pBuffer) {
-                Identifier id = Identifier.parse(Utf8String.read(pBuffer, 32767));
-                return AbstractRegistryServicePMXNeoforge.this.getRegistry().getValue(id);
+                ResourceLocation id = ResourceLocation.parse(Utf8String.read(pBuffer, 32767));
+                return AbstractRegistryServicePMXNeoforge.this.getRegistry().get(id);
             }
 
             @Override
             public void encode(FriendlyByteBuf pBuffer, R pValue) {
-                Identifier id = AbstractRegistryServicePMXNeoforge.this.getRegistry().getKey(pValue);
+                ResourceLocation id = AbstractRegistryServicePMXNeoforge.this.getRegistry().getKey(pValue);
                 Utf8String.write(pBuffer, id.toString(), 32767);
             }
         };
     }
 
     @Override
-    public Optional<ITagValue<R>> getTag(TagKey<R> key) {
-        return this.getRegistry().getTags().filter(n -> n.key().equals(key)).findFirst().map(TagValueNeoforge::new);
+    public ITagValue<R> getTag(TagKey<R> key) {
+        return new TagValueNeoforge<>(this.getRegistry().getOrCreateTag(key));
+    }
+
+    @Override
+    public boolean tagExists(TagKey<R> key) {
+        return this.getRegistry().getTag(key).isPresent();
     }
 }

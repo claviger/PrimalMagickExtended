@@ -72,6 +72,11 @@
       "textTranslationKey": "research.primalmagickextended.gate_rune.text.stage.1"
     },
     {
+      "attunements": {
+        "sources": {
+          "primalmagick:void": 2
+        }
+      },
       "parentKey": {
         "rootKey": "primalmagickextended:gate_rune"
       },
@@ -79,16 +84,9 @@
         "primalmagickextended:gate_rune"
       ],
       "revelations": [],
-      "rewards": [
-        {
-          "amount": 2,
-          "reward_type": "primalmagick:attunement",
-          "source": "primalmagick:void"
-        }
-      ],
       "siblings": [],
       "textTranslationKey": "research.primalmagickextended.gate_rune.text.stage.2"
     }
   ],
-  "tier": "primalmagick:supreme"
+  "tier": "supreme"
 }

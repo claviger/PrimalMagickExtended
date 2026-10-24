@@ -32,12 +32,12 @@ public class FamiliarCommand {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         LiteralCommandNode<CommandSourceStack> node = dispatcher.register(Commands.literal(ConstantsPMX.MOD_ID)
-                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("familiar")
                         .then(action("summon", FamiliarCommand::summon))
                         .then(action("dismiss", FamiliarCommand::dismiss))
                         .then(action("clear", FamiliarCommand::clear))));
-        dispatcher.register(Commands.literal("pmx").requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS)).redirect(node));
+        dispatcher.register(Commands.literal("pmx").requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS)).redirect(node));
     }
 
     private static LiteralArgumentBuilder<CommandSourceStack> action(String name, Action action) {

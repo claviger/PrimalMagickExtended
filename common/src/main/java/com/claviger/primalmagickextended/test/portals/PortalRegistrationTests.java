@@ -10,12 +10,12 @@ import com.claviger.primalmagickextended.common.items.portals.RuneBlockItem;
 import com.claviger.primalmagickextended.common.portals.PortalColor;
 import com.claviger.primalmagickextended.common.tiles.BlockEntityTypesPMX;
 import com.claviger.primalmagickextended.common.util.ResourceUtilsPMX;
-import com.verdantartifice.primalmagick.test.AbstractBaseTest;
+import com.claviger.primalmagickextended.test.AbstractBaseTestPMX;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -27,7 +27,7 @@ import java.util.Map;
  * Tests that the portal blocks, rune blocks, their items, the portal block entity type and the portal particle types
  * are registered under the expected ids with Custom Portals' properties.
  */
-public class PortalRegistrationTests extends AbstractBaseTest {
+public class PortalRegistrationTests extends AbstractBaseTestPMX {
     public static void portal_blocks_and_items_are_registered(GameTestHelper helper) {
         for (PortalColor color : PortalColor.values()) {
             String name = color.getSerializedName();
@@ -68,6 +68,9 @@ public class PortalRegistrationTests extends AbstractBaseTest {
             assertValueEqual(helper, 1, item.getDefaultMaxStackSize(), name + " max stack size");
             BlockItem blockItem = assertInstanceOf(helper, item, RuneBlockItem.class, name + " item should be a rune block item");
             assertTrue(helper, blockItem.getBlock() == block, name + " item should place its rune block");
+            // The rune items are named apart from their blocks, so the item keeps its own key
+            assertValueEqual(helper, "item.primalmagickextended." + name, item.getDescriptionId(), name + " item description id");
+            assertFalse(helper, item.getDescriptionId().equals(block.getDescriptionId()), name + " item description id should differ from its block's");
         }
         helper.succeed();
     }
@@ -79,14 +82,14 @@ public class PortalRegistrationTests extends AbstractBaseTest {
             PortalBlock block = BlocksPMX.portal(color);
             assertTrue(helper, BlockEntityTypesPMX.PORTAL.get().isValid(block.defaultBlockState()), "Portal block entity should be valid for " + name);
 
-            Identifier particleId = ResourceUtilsPMX.loc(name + "_portal_particle");
+            ResourceLocation particleId = ResourceUtilsPMX.loc(name + "_portal_particle");
             ParticleOptions particle = ParticleTypesPMX.particle(color);
             if (color == PortalColor.PURPLE) {
                 assertFalse(helper, BuiltInRegistries.PARTICLE_TYPE.containsKey(particleId), "Purple should have no particle type of its own");
                 assertTrue(helper, particle == ParticleTypes.PORTAL, "Purple portals should use the vanilla portal particle");
             } else {
                 assertTrue(helper, BuiltInRegistries.PARTICLE_TYPE.containsKey(particleId), "Missing particle type " + particleId);
-                assertTrue(helper, particle.getType() == BuiltInRegistries.PARTICLE_TYPE.getValue(particleId), "Particle for " + name + " should be " + particleId);
+                assertTrue(helper, particle.getType() == BuiltInRegistries.PARTICLE_TYPE.get(particleId), "Particle for " + name + " should be " + particleId);
             }
         }
         helper.succeed();

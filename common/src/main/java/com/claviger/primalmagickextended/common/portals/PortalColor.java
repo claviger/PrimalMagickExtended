@@ -2,7 +2,7 @@ package com.claviger.primalmagickextended.common.portals;
 
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.DyeColor;
@@ -52,11 +52,11 @@ public enum PortalColor implements StringRepresentable {
     }
 
     /**
-     * The vanilla dye item of this colour, such as {@code minecraft:white_dye}. Minecraft 26.1 has no direct lookup
-     * from a dye colour to its item, so this resolves the item by id and throws if it is not registered.
+     * The vanilla dye item of this colour, such as {@code minecraft:white_dye}. Resolves the item by id and throws if
+     * it is not registered.
      */
     public Item dyeItem() {
-        return BuiltInRegistries.ITEM.getValueOrThrow(ResourceKey.create(Registries.ITEM, Identifier.withDefaultNamespace(this.dye.getSerializedName() + "_dye")));
+        return BuiltInRegistries.ITEM.getOrThrow(ResourceKey.create(Registries.ITEM, ResourceLocation.withDefaultNamespace(this.dye.getSerializedName() + "_dye")));
     }
 
     public MapColor mapColor() { return this.mapColor; }

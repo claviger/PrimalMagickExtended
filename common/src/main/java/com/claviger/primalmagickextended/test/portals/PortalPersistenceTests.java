@@ -6,11 +6,12 @@ import com.claviger.primalmagickextended.common.portals.PortalColor;
 import com.claviger.primalmagickextended.common.portals.PortalData;
 import com.claviger.primalmagickextended.common.portals.PortalRegistry;
 import com.claviger.primalmagickextended.common.portals.PortalSavedData;
-import com.claviger.primalmagickextended.common.util.ResourceUtilsPMX;
-import com.verdantartifice.primalmagick.test.AbstractBaseTest;
+import com.claviger.primalmagickextended.test.AbstractBaseTestPMX;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -23,7 +24,7 @@ import java.util.UUID;
  * Tests that the portal registry survives a save and reload with its links recomputed, that the client sync packet
  * carries portals unchanged, and that the server-side registry lookup resolves to the saved data.
  */
-public class PortalPersistenceTests extends AbstractBaseTest {
+public class PortalPersistenceTests extends AbstractBaseTestPMX {
     private static final String OVERWORLD = "minecraft:overworld";
 
     private static CustomPortal portal(int x, int z) {
@@ -65,7 +66,7 @@ public class PortalPersistenceTests extends AbstractBaseTest {
                 UUID.randomUUID(), 1, 2, 3, 4, 5);
         SyncPortalsPacket packet = new SyncPortalsPacket(List.of(a, b));
 
-        RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), helper.getLevel().registryAccess());
+        RegistryFriendlyByteBuf buf = registryBuffer(Unpooled.buffer(), helper.getLevel().registryAccess());
         try {
             SyncPortalsPacket.STREAM_CODEC.encode(buf, packet);
             SyncPortalsPacket decoded = SyncPortalsPacket.STREAM_CODEC.decode(buf);
@@ -83,8 +84,16 @@ public class PortalPersistenceTests extends AbstractBaseTest {
         PortalRegistry fromLevel = PortalData.get(helper.getLevel());
         PortalRegistry fromSavedData = PortalSavedData.get(helper.getLevel().getServer()).getRegistry();
         assertTrue(helper, fromLevel == fromSavedData, "PortalData should resolve to the saved server registry");
-        assertValueEqual(helper, ResourceUtilsPMX.loc("portals"), PortalSavedData.TYPE.id(), "saved data id");
-        assertTrue(helper, PortalSavedData.TYPE.codec() == PortalSavedData.CODEC, "Saved data type should use the portal saved data codec");
+        assertValueEqual(helper, "primalmagickextended_portals", PortalSavedData.FILE_NAME, "saved data file name");
+
+        // The factory reads back what the saved data writes, through the persistence codec
+        PortalSavedData original = new PortalSavedData();
+        original.getRegistry().register(portal(0, 0));
+        HolderLookup.Provider registries = helper.getLevel().registryAccess();
+        CompoundTag tag = original.save(new CompoundTag(), registries);
+        assertValueEqual(helper, PortalSavedData.CODEC.encodeStart(NbtOps.INSTANCE, original).getOrThrow(), tag, "saved data tag");
+        PortalSavedData loaded = PortalSavedData.FACTORY.deserializer().apply(tag, registries);
+        assertValueEqual(helper, 1, loaded.getRegistry().getPortals().size(), "loaded portal count");
         helper.succeed();
     }
 }

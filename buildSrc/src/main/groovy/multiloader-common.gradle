@@ -29,6 +29,23 @@ repositories {
         name = 'BlameJared'
         url = 'https://maven.blamejared.com'
     }
+    // Primal Magick's official release jars
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'Modrinth'
+                url = 'https://api.modrinth.com/maven'
+            }
+        }
+        filter { includeGroup('maven.modrinth') }
+    }
+}
+
+// File names already carry the Minecraft version through archivesName, so they drop the "+<minecraft_version>"
+// build metadata that the mod version carries (as in Primal Magick: primalmagick-neoforge-1.21.1-6.0.7.jar)
+def fileVersion = version.toString().replace("+${minecraft_version}", '')
+tasks.withType(Jar).configureEach {
+    archiveVersion = fileVersion
 }
 
 // Read at configuration time; the rename closures run at execution time, where project properties
@@ -50,9 +67,9 @@ jar {
         attributes([
                 'Specification-Title'   : mod_name,
                 'Specification-Vendor'  : mod_author,
-                'Specification-Version' : project.jar.archiveVersion,
+                'Specification-Version' : version,
                 'Implementation-Title'  : project.name,
-                'Implementation-Version': project.jar.archiveVersion,
+                'Implementation-Version': version,
                 'Implementation-Vendor' : mod_author,
                 'Built-On-Minecraft'    : minecraft_version
         ])

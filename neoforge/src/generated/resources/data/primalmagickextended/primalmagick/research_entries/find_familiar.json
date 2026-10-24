@@ -14,7 +14,7 @@
     "finaleExempt": true
   },
   "icon": {
-    "location": "primalmagick:textures/gui/sprites/sources/blood.png"
+    "location": "primalmagick:textures/sources/blood.png"
   },
   "key": {
     "rootKey": "primalmagickextended:find_familiar"

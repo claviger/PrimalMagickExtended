@@ -9,7 +9,7 @@ import commonnetwork.networking.data.Side;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ import java.util.List;
  * Ported from Custom Portals.
  */
 public class SyncPortalsPacket implements IMessageToClient {
-    public static final Identifier CHANNEL = ResourceUtilsPMX.loc("sync_portals");
+    public static final ResourceLocation CHANNEL = ResourceUtilsPMX.loc("sync_portals");
     public static final StreamCodec<RegistryFriendlyByteBuf, SyncPortalsPacket> STREAM_CODEC = StreamCodec.ofMember(SyncPortalsPacket::encode, SyncPortalsPacket::decode);
 
     protected final List<CustomPortal> portals;

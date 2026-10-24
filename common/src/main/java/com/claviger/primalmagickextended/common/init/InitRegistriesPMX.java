@@ -2,10 +2,10 @@ package com.claviger.primalmagickextended.common.init;
 
 import com.claviger.primalmagickextended.client.fx.particles.ParticleTypesPMX;
 import com.claviger.primalmagickextended.common.blocks.BlocksPMX;
+import com.claviger.primalmagickextended.common.entities.CatVariantsPMX;
 import com.claviger.primalmagickextended.common.items.ItemsPMX;
 import com.claviger.primalmagickextended.common.spells.payloads.SpellPayloadsPMX;
 import com.claviger.primalmagickextended.common.tiles.BlockEntityTypesPMX;
-import com.claviger.primalmagickextended.test.TestFunctionsPMX;
 
 /**
  * Point of initialization for the mod's cross-platform deferred registries. Each holder's init()
@@ -19,6 +19,6 @@ public class InitRegistriesPMX {
         BlockEntityTypesPMX.init();
         ParticleTypesPMX.init();
         SpellPayloadsPMX.init();
-        TestFunctionsPMX.init();
+        CatVariantsPMX.init();
     }
 }

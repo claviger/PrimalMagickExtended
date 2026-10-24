@@ -5,23 +5,23 @@ import com.claviger.primalmagickextended.common.familiars.FamiliarManager;
 import com.claviger.primalmagickextended.platform.ServicesPMX;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.verdantartifice.primalmagick.test.AbstractBaseTest;
+import com.claviger.primalmagickextended.test.AbstractBaseTestPMX;
 import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.permissions.LevelBasedPermissionSet;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.animal.wolf.Wolf;
+import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 
 /**
  * Tests for the familiar administration commands.
  */
-public class FamiliarCommandTests extends AbstractBaseTest {
-    private static final Vec3 PLAYER_POS = new Vec3(2.5D, 1.0D, 2.5D);
-    private static final Vec3 PET_POS = new Vec3(1.5D, 1.0D, 1.5D);
+public class FamiliarCommandTests extends AbstractBaseTestPMX {
+    private static final Vec3 PLAYER_POS = new Vec3(2.5D, 2.0D, 2.5D);
+    private static final Vec3 PET_POS = new Vec3(1.5D, 2.0D, 1.5D);
     private static final String ROOT = "primalmagickextended familiar ";
 
     private static ServerPlayer player(GameTestHelper helper) {
@@ -30,8 +30,8 @@ public class FamiliarCommandTests extends AbstractBaseTest {
         return player;
     }
 
-    /** Runs a command as the player with the given permission set, returning its result or -1 if it did not parse. */
-    private static int run(ServerPlayer player, LevelBasedPermissionSet permission, String command) {
+    /** Runs a command as the player with the given permission level, returning its result or -1 if it did not parse. */
+    private static int run(ServerPlayer player, int permission, String command) {
         CommandDispatcher<CommandSourceStack> dispatcher = new CommandDispatcher<>();
         FamiliarCommand.register(dispatcher);
         try {
@@ -42,7 +42,7 @@ public class FamiliarCommandTests extends AbstractBaseTest {
     }
 
     private static int run(ServerPlayer player, String command) {
-        return run(player, LevelBasedPermissionSet.OWNER, command);
+        return run(player, Commands.LEVEL_OWNERS, command);
     }
 
     public static void summon_command_summons_dismissed_familiar(GameTestHelper helper) {
@@ -82,7 +82,7 @@ public class FamiliarCommandTests extends AbstractBaseTest {
         assertFalse(helper, FamiliarManager.hasBondedFamiliar(player), "Player still has a bond");
         assertFalse(helper, wolf.isRemoved(), "Cleared familiar was removed");
         assertTrue(helper, ServicesPMX.CAPABILITIES.binding(wolf).isEmpty(), "Cleared familiar is still bound");
-        assertTrue(helper, wolf.isTame() && wolf.getOwnerReference() != null && wolf.getOwnerReference().getUUID().equals(player.getUUID()), "Cleared familiar lost its owner");
+        assertTrue(helper, wolf.isTame() && player.getUUID().equals(wolf.getOwnerUUID()), "Cleared familiar lost its owner");
         assertValueEqual(helper, "Rex", wolf.getCustomName().getString(), "Cleared familiar lost its name");
         helper.succeed();
     }
@@ -115,7 +115,7 @@ public class FamiliarCommandTests extends AbstractBaseTest {
     public static void commands_require_game_master_permission_and_accept_targets_and_alias(GameTestHelper helper) {
         ServerPlayer player = player(helper);
         Wolf wolf = FamiliarTestUtils.bindWolf(helper, player, PET_POS);
-        assertValueEqual(helper, -1, run(player, LevelBasedPermissionSet.ALL, ROOT + "dismiss"), "Command ran without permission");
+        assertValueEqual(helper, -1, run(player, Commands.LEVEL_ALL, ROOT + "dismiss"), "Command ran without permission");
         assertFalse(helper, wolf.isRemoved(), "Command without permission dismissed the familiar");
         // The alias and an explicit target selector (@s is the player running the command)
         assertValueEqual(helper, 1, run(player, "pmx familiar dismiss @s"), "Alias with a target selector");

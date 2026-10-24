@@ -7,11 +7,10 @@ import com.verdantartifice.primalmagick.common.wands.IManaContainer;
 import com.verdantartifice.primalmagick.common.wands.WandCap;
 import com.verdantartifice.primalmagick.common.wands.WandCore;
 import com.verdantartifice.primalmagick.common.wands.WandGem;
-import com.verdantartifice.primalmagick.test.AbstractBaseTest;
-import com.verdantartifice.primalmagick.test.TestUtils;
+import com.claviger.primalmagickextended.test.AbstractBaseTestPMX;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.animal.wolf.Wolf;
+import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
@@ -19,9 +18,9 @@ import net.minecraft.world.phys.Vec3;
 /**
  * Tests that an in-play familiar within range grants a +5 point mana cost modifier.
  */
-public class FamiliarManaEfficiencyTests extends AbstractBaseTest {
-    private static final Vec3 PLAYER_POS = new Vec3(2.5D, 1.0D, 2.5D);
-    private static final Vec3 PET_POS = new Vec3(1.5D, 1.0D, 1.5D);
+public class FamiliarManaEfficiencyTests extends AbstractBaseTestPMX {
+    private static final Vec3 PLAYER_POS = new Vec3(2.5D, 2.0D, 2.5D);
+    private static final Vec3 PET_POS = new Vec3(1.5D, 2.0D, 1.5D);
     private static final int FAMILIAR_BONUS = 5;
 
     private static ServerPlayer player(GameTestHelper helper) {
@@ -43,7 +42,7 @@ public class FamiliarManaEfficiencyTests extends AbstractBaseTest {
     public static void familiar_nearby_adds_five_to_wand_cost_modifier(GameTestHelper helper) {
         ServerPlayer player = player(helper);
         ItemStack mundane = new ItemStack(ItemsPM.MUNDANE_WAND.get());
-        ItemStack modular = TestUtils.makeModularCaster(ItemsPM.MODULAR_WAND.get(), WandCore.HEARTWOOD, WandCap.IRON, WandGem.APPRENTICE);
+        ItemStack modular = FamiliarTestUtils.makeModularCaster(ItemsPM.MODULAR_WAND.get(), WandCore.HEARTWOOD, WandCap.IRON, WandGem.APPRENTICE);
         int mundaneBefore = modifier(helper, mundane, player);
         int modularBefore = modifier(helper, modular, player);
 
@@ -92,7 +91,7 @@ public class FamiliarManaEfficiencyTests extends AbstractBaseTest {
 
     public static void familiar_bonus_reduces_spell_mana_consumed(GameTestHelper helper) {
         ServerPlayer player = player(helper);
-        ItemStack wandStack = TestUtils.makeModularCaster(ItemsPM.MODULAR_WAND.get(), WandCore.HEARTWOOD, WandCap.IRON, WandGem.APPRENTICE);
+        ItemStack wandStack = FamiliarTestUtils.makeModularCaster(ItemsPM.MODULAR_WAND.get(), WandCore.HEARTWOOD, WandCap.IRON, WandGem.APPRENTICE);
         IManaContainer wand = (IManaContainer)wandStack.getItem();
         int baseCost = 1000;   // centimana
         int modifierWithout = modifier(helper, wandStack, player);

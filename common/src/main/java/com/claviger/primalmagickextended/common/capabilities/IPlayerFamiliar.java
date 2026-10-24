@@ -1,16 +1,15 @@
 package com.claviger.primalmagickextended.common.capabilities;
 
 import com.claviger.primalmagickextended.common.familiars.StoredFamiliar;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 
 import java.util.Optional;
 
 /**
  * Per-player familiar data. Persistent state is the stored familiar; the nearby flag and toggle
- * time are transient, and only the booleans are synced. Delta updates are sent to the owning player
- * only; NeoForge's initial pairing sync also sends the two booleans to players that start tracking
- * the owner (engine limitation), so client code must only read the local player's data.
+ * time are transient, and only the booleans are synced. Updates are sent to the owning player only,
+ * by {@code ServicesPMX.CAPABILITIES.syncFamiliar}, so client code must only read the local player's data.
  */
 public interface IPlayerFamiliar {
     /** The player's bound familiar, whether in play or dismissed; always empty on the client. */
@@ -25,7 +24,10 @@ public interface IPlayerFamiliar {
     /** True if the player has a bound familiar, whether in play or dismissed. Works on both sides. */
     boolean hasFamiliar();
 
-    /** True while the familiar is in play within 100 blocks of the player. Works on both sides. */
+    /**
+     * True while the familiar is in play within 32 blocks ({@code FamiliarManager.NEARBY_RANGE}) of the player.
+     * Works on both sides.
+     */
     boolean isFamiliarNearby();
 
     /**
@@ -40,6 +42,6 @@ public interface IPlayerFamiliar {
     /** Records the game time of a summon/dismiss toggle; -1 means never. Transient, not synced. */
     void setLastToggleGameTime(long gameTime);
 
-    void serialize(ValueOutput output);
-    void deserialize(ValueInput input);
+    CompoundTag serializeNBT(HolderLookup.Provider registries);
+    void deserializeNBT(HolderLookup.Provider registries, CompoundTag tag);
 }

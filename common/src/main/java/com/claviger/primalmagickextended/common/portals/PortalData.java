@@ -28,7 +28,7 @@ public final class PortalData {
 
     @Nullable
     public static CustomPortal getPortalFromPos(Level level, BlockPos pos) {
-        return get(level).getPortalFromPos(level.dimension().identifier().toString(), pos);
+        return get(level).getPortalFromPos(level.dimension().location().toString(), pos);
     }
 
     /**

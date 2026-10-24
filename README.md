@@ -1,23 +1,38 @@
 # Primal Magick Extended
 
-An add-on for [Primal Magick](https://github.com/daedalus4096/PrimalMagick) on Minecraft 26.1.2 / NeoForge.
+An add-on for [Primal Magick](https://github.com/daedalus4096/PrimalMagick) on Minecraft 1.21.1 / NeoForge.
 It requires Primal Magick and extends it; Primal Magick itself is never modified.
 
-This mod targets the Minecraft 26.1 port of Primal Magick at https://github.com/claviger/PrimalMagick
-(branch `port26integration`), since the upstream mod still targets Minecraft 1.21.1.
+This branch (`mc/1.21.1`) is the Minecraft 1.21.1 version, built against the official Primal Magick 6.0.7 release.
+The Minecraft 26.1.2 version, which targets the 26.1 port of Primal Magick, lives on the `main` branch.
+
+## Requirements
+
+- Minecraft 1.21.1
+- [NeoForge](https://neoforged.net/) 21.1.132 or later
+- Primal Magick 6.0.7 or later
+  ([GitHub release](https://github.com/daedalus4096/PrimalMagick/releases/tag/6.0.7),
+  [Modrinth](https://modrinth.com/mod/primal-magick))
+- [Common Networking](https://modrinth.com/mod/common-networking) 1.0.18 or later (Primal Magick needs it too)
+
+### Differences from the 26.1 version
+
+The features are the same as in 0.2.0 on Minecraft 26.1, except:
+- Nautiluses and zombie nautiluses do not exist in Minecraft 1.21.1, so they cannot be familiars.
+- Portal data is saved in the world's `data/primalmagickextended_portals.dat`.
 
 ## Features
 
 ### Familiars
 - **Familiar Collar** (Ritual Magick, expert tier): a ritual crafted from the Summon, Creature and Infernal
   runes plus a bone, a feather and a raw fish, with a ritual bell and an incense brazier nearby. Requires expert ritual casting, those three runes, and the
-  Polymorph and Healing spell payloads. Use it on a pet that is tamed by you (wolf, cat, parrot, horse, donkey, mule, llama,
-  nautilus, zombie nautilus, or a fox that trusts you) to bind it as your familiar.
+  Polymorph and Healing spell payloads. Use it on a pet that is tamed by you (wolf, cat, parrot, horse, donkey, mule,
+  llama, trader llama, or a fox that trusts you) to bind it as your familiar.
 - **Find Familiar** (Sorcery, 2 theories after the collar): a spell payload that summons your familiar if it
   is absent and dismisses it if it is present, with Polymorph's animation and sound.
 - A familiar can never be hurt: any damage dismisses it instead, with no drops. Its name, collar and data
   travel with you, across death, dimensions and relogs.
-- While your familiar is in play within 100 blocks, you gain a modest mana discount of about five percent (a little over two levels of Mana Efficiency).
+- While your familiar is in play within 32 blocks, you gain a modest mana discount of about five percent (a little over two levels of Mana Efficiency).
 - You keep one familiar at a time; binding another releases the first unharmed as an ordinary pet.
 
 Everything is documented in the Grimoire.
@@ -112,27 +127,32 @@ Palyon (MIT licence), ported to NeoForge by Claviger.
 
 ## Building
 
-1. Build Primal Magick first, in its own checkout:
-   ```
-   cd C:/tmp/pm-integration && ./gradlew clean :common:jar :neoforge:jar --no-configuration-cache
-   ```
-   Exactly one `primalmagick-common-*.jar` and one `primalmagick-neoforge-*.jar` must be present in that
-   checkout's `common/build/libs` and `neoforge/build/libs`; the PMX build checks this and tells you what to do.
-2. Point this project at that checkout with `primalmagick_dir` in `gradle.properties` (default
-   `C:/tmp/pm-integration`), or pass `-Pprimalmagick_dir=/path/to/PrimalMagick`, or set it in
-   `~/.gradle/gradle.properties`.
-3. Build: `./gradlew build`. The mod jar is `neoforge/build/libs/primalmagickextended-neoforge-26.1.2-<version>.jar`.
-   Use `./gradlew clean build` for releases; the newest jar in `neoforge/build/libs` is the current one.
+You need Java 21. No Primal Magick checkout is needed: the build downloads the official Primal Magick 6.0.7
+NeoForge release from Modrinth's maven repository, along with its other dependencies.
+
+- `./gradlew build` builds the mod. The jar is `neoforge/build/libs/primalmagickextended-neoforge-1.21.1-<version>.jar`.
+  Use `./gradlew clean build` for releases; the newest jar in `neoforge/build/libs` is the current one.
+- `./gradlew :neoforge:runGameTestServer` runs the automated game tests.
+- `./gradlew :neoforge:runData` regenerates the data files (see Development).
+
+The version comes from the git tags. Release tags on this branch carry the Minecraft version as build metadata: the
+tag `0.2.0+1.21.1` gives version `0.2.0+1.21.1` and the jar `primalmagickextended-neoforge-1.21.1-0.2.0.jar`.
+Builds after a tag also carry the commit count and hash, for example `0.2.0-3-gabc1234+1.21.1`. CI
+(`.github/workflows/build.yml`) runs `:neoforge:build` and `:neoforge:runGameTestServer` on Java 21 for every push
+and pull request to `mc/1.21.1`.
 
 At runtime the mod needs Primal Magick and Common Networking installed alongside it.
 
 ## Development
 
-- `./gradlew :neoforge:runClient`, `:neoforge:runServer`: dev runs with Primal Magick loaded from its built jar.
-- `./gradlew :neoforge:runData`: regenerate `neoforge/src/generated/resources` (lang, models, recipes,
-  research entries, tags, affinities, cat variants, test instances). Commit the output.
-- `./gradlew :neoforge:runGameTestServer`: run the automated game tests (only this mod's namespace runs,
-  via vanilla's `--tests primalmagickextended:*` selector).
+- `./gradlew :neoforge:runClient`, `:neoforge:runServer`: dev runs with Primal Magick, Common Networking and JEI
+  loaded.
+- `./gradlew :neoforge:runData`: regenerate `neoforge/src/generated/resources` (lang, blockstates, models, particle
+  descriptions, recipes and their advancements, research entries, tags, affinities and loot tables). Commit the
+  output.
+- `./gradlew :neoforge:runGameTestServer`: run the automated game tests. Only this mod's tests run: the runs set
+  `neoforge.enabledGameTestNamespaces=primalmagickextended`, which keeps only tests whose structure templates are in
+  this mod's namespace.
 
 The layout, conventions and service pattern mirror Primal Magick's: `common` holds platform-neutral code,
 `neoforge` holds the loader-specific code, registry holders end in `PMX`, localization lives only in the

@@ -7,7 +7,11 @@ plugins {
 allprojects {
     // gitVersion() is "<tag>-<n>-g<hash>" once a release tag exists; until then it is only the commit
     // hash, which NeoForge rejects as a mod version, so prefix it with a placeholder version.
-    // Release tags are bare like Primal Magick's ("0.1.0"); strip a stray "v" prefix if one is used anyway
+    // Release tags on this branch are "<x.y.z>+<minecraft_version>" (e.g. "0.2.0+1.21.1"); main's bare tags
+    // ("0.2.0") are only visible here at the branch point. Either way the Minecraft version is moved to the end
+    // as semver build metadata: "0.2.0+1.21.1", "0.2.0-3-gabc1234+1.21.1", "0.2.0-3-gabc1234.dirty+1.21.1".
+    def mcSuffix = "+${minecraft_version}"
     def gitVer = gitVersion().replaceFirst(/^v(?=\d)/, '')
-    version = gitVer ==~ /^[0-9a-f]{7,}(\.dirty)?$/ ? "0.0.0-${gitVer}" : gitVer
+    def baseVer = gitVer ==~ /^[0-9a-f]{7,}(\.dirty)?$/ ? "0.0.0-${gitVer}" : gitVer
+    version = baseVer.replace(mcSuffix, '') + mcSuffix
 }

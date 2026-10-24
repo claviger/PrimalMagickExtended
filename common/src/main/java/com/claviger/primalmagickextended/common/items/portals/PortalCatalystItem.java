@@ -15,8 +15,8 @@ import java.util.function.Supplier;
 
 /**
  * Item that fills a closed frame with portal blocks of its colour when used on the frame. Using it on a block face
- * starts the frame search from the block next to that face. On success one catalyst is consumed. Ported from
- * Custom Portals.
+ * starts the frame search from the block next to that face. On success one catalyst is consumed; only the
+ * client's success swings the arm. Ported from Custom Portals.
  */
 public class PortalCatalystItem extends Item {
     private final Supplier<? extends Block> portalBlock;
@@ -44,7 +44,7 @@ public class PortalCatalystItem extends Item {
         if (PortalHelper.buildPortal(pos, portalBlock.get(), playerEntity.getUUID(), world)) {
             playerEntity.playSound(SoundEvents.FLINTANDSTEEL_USE, 1.0F, 1.0F);
             ctx.getItemInHand().shrink(1);
-            return InteractionResult.SUCCESS;
+            return InteractionResult.sidedSuccess(world.isClientSide());
         }
         return InteractionResult.PASS;
     }

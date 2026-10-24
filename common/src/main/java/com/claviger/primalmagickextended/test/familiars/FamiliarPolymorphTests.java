@@ -5,13 +5,14 @@ import com.claviger.primalmagickextended.common.familiars.FamiliarManager;
 import com.claviger.primalmagickextended.common.familiars.StoredFamiliar;
 import com.claviger.primalmagickextended.platform.ServicesPMX;
 import com.verdantartifice.primalmagick.common.misc.EntitySwapper;
-import com.verdantartifice.primalmagick.test.AbstractBaseTest;
+import com.claviger.primalmagickextended.test.AbstractBaseTestPMX;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.animal.sheep.Sheep;
-import net.minecraft.world.entity.animal.wolf.Wolf;
+import net.minecraft.world.entity.animal.Sheep;
+import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
 
@@ -23,10 +24,10 @@ import java.util.concurrent.atomic.AtomicReference;
  * Tests that a familiar transformed by Primal Magick's Polymorph spell keeps a consistent binding when
  * the spell's queued swap-back restores its original form.
  */
-public class FamiliarPolymorphTests extends AbstractBaseTest {
-    private static final Vec3 PLAYER_POS = new Vec3(2.5D, 1.0D, 2.5D);
-    private static final Vec3 PET_POS = new Vec3(1.5D, 1.0D, 1.5D);
-    private static final Vec3 OTHER_PET_POS = new Vec3(3.5D, 1.0D, 1.5D);
+public class FamiliarPolymorphTests extends AbstractBaseTestPMX {
+    private static final Vec3 PLAYER_POS = new Vec3(2.5D, 2.0D, 2.5D);
+    private static final Vec3 PET_POS = new Vec3(1.5D, 2.0D, 1.5D);
+    private static final Vec3 OTHER_PET_POS = new Vec3(3.5D, 2.0D, 1.5D);
     /** Polymorph length in ticks; long enough that the swap-back cannot fire before the test acts. */
     private static final int POLYMORPH_TICKS = 40;
     /** The attachment compound NeoForge writes into an entity save, and this mod's binding entry inside it. */
@@ -51,8 +52,8 @@ public class FamiliarPolymorphTests extends AbstractBaseTest {
     private static void polymorphIntoSheep(GameTestHelper helper, Wolf wolf) {
         CompoundTag originalData = FamiliarTestUtils.snapshot(wolf);
         FamiliarBinding binding = ServicesPMX.CAPABILITIES.binding(wolf).orElseThrow();
-        Optional<FamiliarBinding> saved = originalData.getCompound(ATTACHMENTS_KEY)
-                .flatMap(attachments -> attachments.read(BINDING_KEY, FamiliarBinding.MAP_CODEC.codec()));
+        Optional<FamiliarBinding> saved = FamiliarBinding.MAP_CODEC.codec()
+                .parse(NbtOps.INSTANCE, originalData.getCompound(ATTACHMENTS_KEY).get(BINDING_KEY)).result();
         assertValueEqual(helper, Optional.of(binding), saved, "Binding in the entity save under " + ATTACHMENTS_KEY + "/" + BINDING_KEY);
         EntitySwapper.enqueue(wolf, new EntitySwapper(EntityType.SHEEP, originalData, Optional.of(POLYMORPH_TICKS), 0));
     }
@@ -124,7 +125,7 @@ public class FamiliarPolymorphTests extends AbstractBaseTest {
                     Wolf released = restored.get();
                     assertFalse(helper, released.isRemoved(), "Swapped-back former familiar was discarded");
                     assertTrue(helper, ServicesPMX.CAPABILITIES.binding(released).isEmpty(), "Swapped-back former familiar is still bound");
-                    assertTrue(helper, released.isTame() && released.getOwnerReference() != null && released.getOwnerReference().getUUID().equals(player.getUUID()), "Swapped-back former familiar is not the player's pet");
+                    assertTrue(helper, released.isTame() && player.getUUID().equals(released.getOwnerUUID()), "Swapped-back former familiar is not the player's pet");
                     assertValueEqual(helper, Optional.of(newPet.get().getUUID()), stored(player).activeEntityId(), "Active familiar after the swap-back");
                 })
                 .thenSucceed();

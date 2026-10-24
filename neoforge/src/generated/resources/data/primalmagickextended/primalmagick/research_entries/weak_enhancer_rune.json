@@ -44,6 +44,7 @@
           {
             "requirement_type": "primalmagick:item_stack",
             "stack": {
+              "count": 1,
               "id": "minecraft:amethyst_shard"
             }
           },
@@ -65,6 +66,11 @@
       "textTranslationKey": "research.primalmagickextended.weak_enhancer_rune.text.stage.1"
     },
     {
+      "attunements": {
+        "sources": {
+          "primalmagick:infernal": 2
+        }
+      },
       "parentKey": {
         "rootKey": "primalmagickextended:weak_enhancer_rune"
       },
@@ -72,16 +78,9 @@
         "primalmagickextended:weak_enhancer_rune"
       ],
       "revelations": [],
-      "rewards": [
-        {
-          "amount": 2,
-          "reward_type": "primalmagick:attunement",
-          "source": "primalmagick:infernal"
-        }
-      ],
       "siblings": [],
       "textTranslationKey": "research.primalmagickextended.weak_enhancer_rune.text.stage.2"
     }
   ],
-  "tier": "primalmagick:expert"
+  "tier": "expert"
 }

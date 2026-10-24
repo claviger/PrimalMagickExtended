@@ -229,7 +229,7 @@ public class PortalHelper {
         if (!world.isClientSide()) {
             SpawnPosData spawnPosData = determineSpawnPos(portalBlocks, portalBlock, axis, world);
 
-            CustomPortal portal = new CustomPortal(frameId, world.dimension().identifier().toString(),
+            CustomPortal portal = new CustomPortal(frameId, world.dimension().location().toString(),
                     portalBlock.defaultMapColor(), spawnPosData.blockPos, portalBlocks, spawnPosData.offsetX,
                     spawnPosData.offsetZ, creatorId);
             // count any runes already on the frame before registering, so the first link attempt sees them

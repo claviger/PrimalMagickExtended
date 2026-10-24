@@ -5,11 +5,14 @@
       "feature": "portals"
     }
   ],
-  "type": "primalmagick:shaped_arcane",
-  "category": "arcane",
+  "type": "primalmagick:arcane_crafting_shaped",
   "key": {
-    "#": "minecraft:lapis_lazuli",
-    "A": "minecraft:amethyst_shard"
+    "#": {
+      "item": "minecraft:lapis_lazuli"
+    },
+    "A": {
+      "item": "minecraft:amethyst_shard"
+    }
   },
   "mana": {
     "sources": {
@@ -28,6 +31,7 @@
     }
   },
   "result": {
+    "count": 1,
     "id": "primalmagickextended:weak_enhancer_rune"
   }
 }

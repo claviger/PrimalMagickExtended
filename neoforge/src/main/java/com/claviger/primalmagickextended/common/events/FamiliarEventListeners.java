@@ -1,6 +1,7 @@
 package com.claviger.primalmagickextended.common.events;
 
 import com.claviger.primalmagickextended.ConstantsPMX;
+import com.claviger.primalmagickextended.platform.ServicesPMX;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -19,7 +20,9 @@ import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
 /**
  * NeoForge listeners for familiar-related events. The damage, death and join listeners run at the highest
- * priority so other listeners never observe a hit, death or join that is cancelled here.
+ * priority so other listeners never observe a hit, death or join that is cancelled here. The login, respawn and
+ * dimension change listeners resend the player's familiar data, since the client then has a new player entity
+ * whose attached data starts empty.
  */
 @EventBusSubscriber(modid = ConstantsPMX.MOD_ID)
 public class FamiliarEventListeners {
@@ -49,6 +52,27 @@ public class FamiliarEventListeners {
     public static void onEntityJoin(EntityJoinLevelEvent event) {
         if (FamiliarEvents.onEntityJoin(event.getEntity(), event.getLevel())) {
             event.setCanceled(true);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerLogin(PlayerEvent.PlayerLoggedInEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            ServicesPMX.CAPABILITIES.syncFamiliar(player);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerRespawn(PlayerEvent.PlayerRespawnEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            ServicesPMX.CAPABILITIES.syncFamiliar(player);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerChangedDimension(PlayerEvent.PlayerChangedDimensionEvent event) {
+        if (event.getEntity() instanceof ServerPlayer player) {
+            ServicesPMX.CAPABILITIES.syncFamiliar(player);
         }
     }
 

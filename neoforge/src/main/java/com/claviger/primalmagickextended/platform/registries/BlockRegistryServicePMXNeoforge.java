@@ -10,8 +10,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import java.util.function.Supplier;
 
 /**
- * NeoForge implementation of the block registry service. Blocks are constructed inside Primal Magick's
- * RegistryIdContext (see the base class), so their properties receive their registry key automatically.
+ * NeoForge implementation of the block registry service.
  */
 public class BlockRegistryServicePMXNeoforge extends AbstractRegistryServicePMXNeoforge<Block> implements IBlockRegistryServicePMX {
     private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(BuiltInRegistries.BLOCK, ConstantsPMX.MOD_ID);

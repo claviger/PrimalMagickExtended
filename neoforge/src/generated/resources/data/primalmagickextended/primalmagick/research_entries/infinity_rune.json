@@ -62,6 +62,12 @@
       "textTranslationKey": "research.primalmagickextended.infinity_rune.text.stage.1"
     },
     {
+      "attunements": {
+        "sources": {
+          "primalmagick:infernal": 2,
+          "primalmagick:void": 2
+        }
+      },
       "parentKey": {
         "rootKey": "primalmagickextended:infinity_rune"
       },
@@ -69,21 +75,9 @@
         "primalmagickextended:infinity_rune"
       ],
       "revelations": [],
-      "rewards": [
-        {
-          "amount": 2,
-          "reward_type": "primalmagick:attunement",
-          "source": "primalmagick:infernal"
-        },
-        {
-          "amount": 2,
-          "reward_type": "primalmagick:attunement",
-          "source": "primalmagick:void"
-        }
-      ],
       "siblings": [],
       "textTranslationKey": "research.primalmagickextended.infinity_rune.text.stage.2"
     }
   ],
-  "tier": "primalmagick:master"
+  "tier": "master"
 }

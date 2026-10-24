@@ -4,15 +4,15 @@ import com.claviger.primalmagickextended.common.conditions.ConditionsPMXNeoforge
 import com.claviger.primalmagickextended.common.conditions.FeatureEnabledCondition;
 import com.claviger.primalmagickextended.common.features.FeaturePMX;
 import com.claviger.primalmagickextended.common.research.ResearchEntriesPMX;
+import com.claviger.primalmagickextended.test.AbstractBaseTestPMX;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mojang.serialization.JsonOps;
 import com.verdantartifice.primalmagick.common.research.ResearchEntry;
-import com.verdantartifice.primalmagick.test.AbstractBaseTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.Identifier;
 import net.minecraft.resources.RegistryOps;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.neoforged.neoforge.common.conditions.ConditionalOps;
 import net.neoforged.neoforge.common.conditions.ICondition;
@@ -26,7 +26,7 @@ import java.util.Optional;
  * Tests for the feature load condition, which lives in the NeoForge module. The config itself is never changed:
  * the condition's false path is driven through a stand-in for the config.
  */
-public class FeatureConditionTests extends AbstractBaseTest {
+public class FeatureConditionTests extends AbstractBaseTestPMX {
     public static void feature_condition_follows_config(GameTestHelper helper) {
         for (FeaturePMX feature : FeaturePMX.values()) {
             String name = feature.getSerializedName();
@@ -48,7 +48,8 @@ public class FeatureConditionTests extends AbstractBaseTest {
     }
 
     public static void plain_registry_ops_have_no_condition_context(GameTestHelper helper) {
-        // FeatureEnabledCondition keeps entries decoded without a condition context. NetworkRegistryLoadTask decodes
+        // FeatureEnabledCondition keeps entries decoded without a condition context.
+        // RegistryDataLoader.loadContentsFromNetwork decodes a client's local copies of the entries a server listed
         // with plain RegistryOps, so those must keep yielding IContext.EMPTY, while data pack loading has a context
         RegistryOps<JsonElement> plain = RegistryOps.create(JsonOps.INSTANCE, helper.getLevel().registryAccess());
         ICondition.IContext plainContext = ConditionalOps.retrieveContext().codec().decode(plain, plain.emptyMap()).getOrThrow().getFirst();
@@ -76,8 +77,8 @@ public class FeatureConditionTests extends AbstractBaseTest {
 
     public static void conditioned_research_entry_loads_while_enabled(GameTestHelper helper) {
         // Decode a generated research entry the way NeoForge loads data pack registries; with the feature on it loads
-        Identifier file = Identifier.fromNamespaceAndPath(ResearchEntriesPMX.PORTAL_TRAVEL.identifier().getNamespace(),
-                "primalmagick/research_entries/" + ResearchEntriesPMX.PORTAL_TRAVEL.identifier().getPath() + ".json");
+        ResourceLocation file = ResourceLocation.fromNamespaceAndPath(ResearchEntriesPMX.PORTAL_TRAVEL.location().getNamespace(),
+                "primalmagick/research_entries/" + ResearchEntriesPMX.PORTAL_TRAVEL.location().getPath() + ".json");
         Resource resource = helper.getLevel().getServer().getResourceManager().getResource(file).orElseThrow(() -> new IllegalStateException("Missing " + file));
         JsonElement json;
         try (Reader reader = resource.openAsReader()) {

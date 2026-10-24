@@ -41,12 +41,14 @@
           {
             "requirement_type": "primalmagick:item_stack",
             "stack": {
+              "count": 1,
               "id": "minecraft:ender_pearl"
             }
           },
           {
             "requirement_type": "primalmagick:item_stack",
             "stack": {
+              "count": 1,
               "id": "minecraft:ender_eye"
             }
           }
@@ -61,6 +63,11 @@
       "textTranslationKey": "research.primalmagickextended.portal_travel.text.stage.1"
     },
     {
+      "attunements": {
+        "sources": {
+          "primalmagick:infernal": 2
+        }
+      },
       "parentKey": {
         "rootKey": "primalmagickextended:portal_travel"
       },
@@ -83,16 +90,9 @@
         "primalmagickextended:black_portal_catalyst"
       ],
       "revelations": [],
-      "rewards": [
-        {
-          "amount": 2,
-          "reward_type": "primalmagick:attunement",
-          "source": "primalmagick:infernal"
-        }
-      ],
       "siblings": [],
       "textTranslationKey": "research.primalmagickextended.portal_travel.text.stage.2"
     }
   ],
-  "tier": "primalmagick:expert"
+  "tier": "expert"
 }

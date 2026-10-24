@@ -7,7 +7,6 @@ import com.claviger.primalmagickextended.common.portals.PortalRegistry;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
@@ -102,11 +101,13 @@ public class AbstractRuneBlock extends FaceAttachedHorizontalDirectionalBlock {
 
     /**
      * Recounts the runes of the portal(s) this rune was mounted on, whenever a rune is removed by any means: by a
-     * player, a piston, an explosion, a command or losing its support. Runs after the rune is gone from the world.
+     * player, a piston, an explosion, a command or losing its support. Runs on the server only, after the rune is
+     * gone from the world. A rune replaced by the same rune in another orientation is left to {@link #onPlace}.
      */
     @Override
-    protected void affectNeighborsAfterRemoval(BlockState state, ServerLevel level, BlockPos pos, boolean movedByPiston) {
-        super.affectNeighborsAfterRemoval(state, level, pos, movedByPiston);
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        super.onRemove(state, level, pos, newState, movedByPiston);
+        if (level.isClientSide() || state.is(newState.getBlock())) return;
         updatePortals(level, PortalHelper.getPortalsAroundFrame(level, getBlockMountedPos(pos, state)));
     }
 

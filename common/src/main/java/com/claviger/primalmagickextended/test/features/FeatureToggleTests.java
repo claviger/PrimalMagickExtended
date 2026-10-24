@@ -8,6 +8,7 @@ import com.claviger.primalmagickextended.common.research.StaleResearchTopicsPMX;
 import com.claviger.primalmagickextended.common.spells.payloads.FindFamiliarSpellPayload;
 import com.claviger.primalmagickextended.common.util.ResourceUtilsPMX;
 import com.claviger.primalmagickextended.platform.ServicesPMX;
+import com.claviger.primalmagickextended.test.AbstractBaseTestPMX;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -22,18 +23,17 @@ import com.verdantartifice.primalmagick.common.research.topics.AbstractResearchT
 import com.verdantartifice.primalmagick.common.research.topics.EntryResearchTopic;
 import com.verdantartifice.primalmagick.common.research.topics.MainIndexResearchTopic;
 import com.verdantartifice.primalmagick.platform.Services;
-import com.verdantartifice.primalmagick.test.AbstractBaseTest;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.Identifier;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.stats.RecipeBookSettings;
 import net.minecraft.stats.ServerRecipeBook;
-import net.minecraft.world.item.crafting.Recipe;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
  * each feature's research entries, recipes and recipe advancements, and that research and recipe keys left behind
  * by a disabled feature are harmless.
  */
-public class FeatureToggleTests extends AbstractBaseTest {
+public class FeatureToggleTests extends AbstractBaseTestPMX {
     private static final String CONDITIONS_KEY = "neoforge:conditions";
     private static final String CONDITION_TYPE = ConstantsPMX.MOD_ID + ":feature_enabled";
     private static final List<String> RUNES = List.of("weak_enhancer_rune", "strong_enhancer_rune", "infinity_rune", "gate_rune", "haste_rune");
@@ -133,15 +133,15 @@ public class FeatureToggleTests extends AbstractBaseTest {
 
         // The feature map used at datagen agrees with the expected membership
         Map<String, FeaturePMX> mapped = ResearchEntriesPMX.FEATURES.entrySet().stream()
-                .collect(Collectors.toMap(e -> e.getKey().identifier().getPath(), Map.Entry::getValue));
+                .collect(Collectors.toMap(e -> e.getKey().location().getPath(), Map.Entry::getValue));
         assertValueEqual(helper, expectedResearchEntries(), mapped, "Research entry feature map");
         helper.succeed();
     }
 
     public static void opaque_tag_reference_is_optional(GameTestHelper helper) {
         ResourceManager manager = helper.getLevel().getServer().getResourceManager();
-        Identifier tagFile = Identifier.fromNamespaceAndPath("primalmagick", "tags/primalmagick/research_entries/opaque.json");
-        String portalTravel = ResearchEntriesPMX.PORTAL_TRAVEL.identifier().toString();
+        ResourceLocation tagFile = ResourceLocation.fromNamespaceAndPath("primalmagick", "tags/primalmagick/research_entries/opaque.json");
+        String portalTravel = ResearchEntriesPMX.PORTAL_TRAVEL.location().toString();
         int references = 0;
         for (Resource resource : manager.getResourceStack(tagFile)) {
             for (JsonElement value : readJson(resource).getAsJsonObject().getAsJsonArray("values")) {
@@ -162,7 +162,7 @@ public class FeatureToggleTests extends AbstractBaseTest {
         RegistryAccess registryAccess = helper.getLevel().registryAccess();
         ResourceKey<ResearchEntry> missing = ResourceKey.create(RegistryKeysPM.RESEARCH_ENTRIES, ResourceUtilsPMX.loc("no_such_entry"));
         ResearchEntryKey staleKey = new ResearchEntryKey(missing);
-        assertFalse(helper, registryAccess.lookupOrThrow(RegistryKeysPM.RESEARCH_ENTRIES).containsKey(missing), "The missing entry exists");
+        assertFalse(helper, registryAccess.registryOrThrow(RegistryKeysPM.RESEARCH_ENTRIES).containsKey(missing), "The missing entry exists");
 
         // Knowledge left behind by a disabled feature: a known, flagged entry the Grimoire was last open at
         IPlayerKnowledge knowledge = Services.CAPABILITIES.knowledge(player).orElseThrow();
@@ -195,13 +195,26 @@ public class FeatureToggleTests extends AbstractBaseTest {
 
         // The recipe book: a stale recipe is dropped when the player loads, and sending a book that still holds a
         // stale id to the client does not fail
-        ResourceKey<Recipe<?>> missingRecipe = ResourceKey.create(Registries.RECIPE, ResourceUtilsPMX.loc("no_such_recipe"));
+        ResourceLocation missingRecipe = ResourceUtilsPMX.loc("no_such_recipe");
+        ListTag staleIds = new ListTag();
+        staleIds.add(StringTag.valueOf(missingRecipe.toString()));
+        CompoundTag savedBook = new CompoundTag();
+        savedBook.put("recipes", staleIds);
+        savedBook.put("toBeDisplayed", staleIds.copy());
         ServerRecipeBook book = player.getRecipeBook();
-        book.loadUntrusted(new ServerRecipeBook.Packed(new RecipeBookSettings(), List.of(missingRecipe), List.of(missingRecipe)),
-                id -> helper.getLevel().getServer().getRecipeManager().byKey(id).isPresent());
+        book.fromNbt(savedBook, helper.getLevel().getServer().getRecipeManager());
         assertFalse(helper, book.contains(missingRecipe), "Stale recipe kept on load");
-        book.add(missingRecipe);
-        book.sendInitialRecipeBook(player);
+        ServerRecipeBook staleBook = new ServerRecipeBook() {
+            {
+                this.add(missingRecipe);
+                this.addHighlight(missingRecipe);
+            }
+        };
+        assertTrue(helper, staleBook.contains(missingRecipe), "Could not add the stale recipe id");
+        // Only proves the server sends the book without failing; the client drops unknown ids
+        // (ClientPacketListener.handleAddOrRemoveRecipes looks each up with recipeManager.byKey(...).ifPresent),
+        // which a game test cannot exercise
+        staleBook.sendInitialRecipeBook(player);
         helper.succeed();
     }
 

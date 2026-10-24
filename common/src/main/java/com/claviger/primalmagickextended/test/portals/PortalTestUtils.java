@@ -5,7 +5,6 @@ import com.claviger.primalmagickextended.common.portals.PortalData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -56,7 +55,8 @@ public class PortalTestUtils {
 
     /**
      * Uses a catalyst, held in the player's main hand, on the top face of the frame block below the interior's
-     * bottom-left block, as a player clicking it would.
+     * bottom-left block, as a player clicking it would. The use runs on the server, so a success is
+     * {@code CONSUME}.
      */
     public static InteractionResult lightPortal(GameTestHelper helper, ServerPlayer player, Item catalyst, BlockPos interiorBottomLeftRel) {
         if (!player.getMainHandItem().is(catalyst)) {
@@ -90,8 +90,8 @@ public class PortalTestUtils {
      * positions read from the portal registry need no conversion.
      */
     public static void assertItemNear(GameTestHelper helper, Item item, BlockPos absolutePos, double distance) {
-        boolean present = helper.getLevel().hasEntities(EntityType.ITEM, new AABB(absolutePos).inflate(distance),
-                entity -> entity.isAlive() && entity.getItem().is(item));
-        helper.assertTrue(present, Component.literal("Expected a " + item + " item entity near " + absolutePos));
+        boolean present = !helper.getLevel().getEntities(EntityType.ITEM, new AABB(absolutePos).inflate(distance),
+                entity -> entity.isAlive() && entity.getItem().is(item)).isEmpty();
+        helper.assertTrue(present, "Expected a " + item + " item entity near " + absolutePos);
     }
 }

@@ -12,53 +12,47 @@ import com.verdantartifice.primalmagick.common.sources.Sources;
 import com.verdantartifice.primalmagick.common.tags.CommonTags;
 import com.verdantartifice.primalmagick.datagen.recipes.ArcaneShapedRecipeBuilder;
 import com.verdantartifice.primalmagick.datagen.recipes.RitualRecipeBuilder;
-import net.minecraft.advancements.criterion.InventoryChangeTrigger;
-import net.minecraft.advancements.criterion.ItemPredicate;
-import net.minecraft.core.HolderGetter;
+import net.minecraft.advancements.critereon.InventoryChangeTrigger;
+import net.minecraft.advancements.critereon.ItemPredicate;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.Registries;
+import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.data.recipes.ShapelessRecipeBuilder;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.block.Block;
+
+import java.util.concurrent.CompletableFuture;
 
 /**
- * Recipe data provider for the mod. Uses Primal Magick's ritual recipe builder; recipe ids take this
- * mod's namespace because they are derived from the result item. Every recipe belongs to a feature and is
- * written through {@link #featureOutput(FeaturePMX)}, so that the platform can make it load only while
- * that feature is turned on.
+ * Recipe data provider for the mod. Uses Primal Magick's recipe builders; recipe ids take this mod's namespace
+ * because they are derived from the result item. Every recipe belongs to a feature and is written through
+ * {@link #featureOutput(RecipeOutput, FeaturePMX)}, so that the platform can make it load only while that feature is
+ * turned on.
  */
 public class RecipesPMX extends RecipeProvider {
-    // Vanilla RecipeProvider.items is private outside Primal Magick's access transformer, so the common module keeps its own lookup
-    protected final HolderGetter<Item> itemGetter;
-    protected final HolderGetter<Block> blocks;
-
-    public RecipesPMX(HolderLookup.Provider registries, RecipeOutput output) {
-        super(registries, output);
-        this.itemGetter = registries.lookupOrThrow(Registries.ITEM);
-        this.blocks = registries.lookupOrThrow(Registries.BLOCK);
+    public RecipesPMX(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
+        super(packOutput, registries);
     }
 
     /**
      * The output for the recipes of a feature, and their unlock advancements. Load conditions are a platform
      * feature, so this returns the plain output and the NeoForge subclass attaches the feature's condition.
      */
-    protected RecipeOutput featureOutput(FeaturePMX feature) {
-        return this.output;
+    protected RecipeOutput featureOutput(RecipeOutput output, FeaturePMX feature) {
+        return output;
     }
 
     @Override
-    protected void buildRecipes() {
-        this.registerFamiliarRecipes();
-        this.registerPortalRecipes();
+    protected void buildRecipes(RecipeOutput output) {
+        this.registerFamiliarRecipes(output);
+        this.registerPortalRecipes(output);
     }
 
-    protected void registerFamiliarRecipes() {
-        RitualRecipeBuilder.ritualRecipe(this.itemGetter, this.blocks, ItemsPMX.FAMILIAR_COLLAR.get())
+    protected void registerFamiliarRecipes(RecipeOutput output) {
+        RitualRecipeBuilder.ritualRecipe(ItemsPMX.FAMILIAR_COLLAR.get())
                 .addIngredient(ItemsPM.RUNE_SUMMON.get())
                 .addIngredient(ItemsPM.RUNE_CREATURE.get())
                 .addIngredient(ItemsPM.RUNE_INFERNAL.get())
@@ -70,20 +64,20 @@ public class RecipesPMX extends RecipeProvider {
                 .requiredResearch(ResearchEntriesPMX.FAMILIAR_COLLAR)
                 .manaCost(SourceList.EMPTY.add(Sources.BLOOD, 20).add(Sources.INFERNAL, 20))
                 .instability(3)
-                .build(this.featureOutput(FeaturePMX.FAMILIARS));
+                .build(this.featureOutput(output, FeaturePMX.FAMILIARS));
     }
 
     /**
      * Registers the portal catalyst and rune recipes, ported from the datapack with mana in whole mana. Catalysts and
      * runes are crafted only at the arcane workbench; the one vanilla recipe per colour recolours an existing catalyst.
      */
-    protected void registerPortalRecipes() {
-        RecipeOutput output = this.featureOutput(FeaturePMX.PORTALS);
+    protected void registerPortalRecipes(RecipeOutput output) {
+        RecipeOutput portalOutput = this.featureOutput(output, FeaturePMX.PORTALS);
         for (PortalColor color : PortalColor.values()) {
             Item catalyst = ItemsPMX.catalyst(color);
             Item dye = color.dyeItem();
             // One shared expertise group, so crafting all sixteen colours grants expertise once rather than sixteen times
-            ArcaneShapedRecipeBuilder.arcaneShapedRecipe(this.itemGetter, catalyst, 2)
+            ArcaneShapedRecipeBuilder.arcaneShapedRecipe(catalyst, 2)
                     .patternLine("#E#")
                     .patternLine("PBP")
                     .patternLine("#E#")
@@ -94,28 +88,28 @@ public class RecipesPMX extends RecipeProvider {
                     .requiredResearch(ResearchEntriesPMX.PORTAL_TRAVEL)
                     .manaCost(SourceList.EMPTY.add(Sources.INFERNAL, 100))
                     .expertiseGroup(ResourceUtilsPMX.loc("portal_catalysts"))
-                    .build(output);
+                    .build(portalOutput);
 
             Item[] otherCatalysts = ItemsPMX.catalysts().stream().filter(other -> other != catalyst).toArray(Item[]::new);
             // Unlocks on owning any catalyst that this recipe can recolour. A single predicate over all fifteen items
             // matches any of them; one predicate per item would require all of them.
-            this.shapeless(RecipeCategory.MISC, catalyst)
+            ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, catalyst)
                     .requires(Ingredient.of(otherCatalysts))
                     .requires(dye)
                     .group("portal_catalyst")
-                    .unlockedBy("has_portal_catalyst", InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(this.itemGetter, otherCatalysts)))
-                    .save(output, ResourceKey.create(Registries.RECIPE, ResourceUtilsPMX.loc(color.getSerializedName() + "_portal_catalyst_2")));
+                    .unlockedBy("has_portal_catalyst", InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(otherCatalysts)))
+                    .save(portalOutput, ResourceUtilsPMX.loc(color.getSerializedName() + "_portal_catalyst_2"));
         }
 
-        ArcaneShapedRecipeBuilder.arcaneShapedRecipe(this.itemGetter, ItemsPMX.WEAK_ENHANCER_RUNE.get())
+        ArcaneShapedRecipeBuilder.arcaneShapedRecipe(ItemsPMX.WEAK_ENHANCER_RUNE.get())
                 .patternLine("###")
                 .patternLine("#A ")
                 .key('#', Items.LAPIS_LAZULI)
                 .key('A', Items.AMETHYST_SHARD)
                 .requiredResearch(ResearchEntriesPMX.WEAK_ENHANCER_RUNE)
                 .manaCost(SourceList.EMPTY.add(Sources.INFERNAL, 250))
-                .build(output);
-        ArcaneShapedRecipeBuilder.arcaneShapedRecipe(this.itemGetter, ItemsPMX.STRONG_ENHANCER_RUNE.get())
+                .build(portalOutput);
+        ArcaneShapedRecipeBuilder.arcaneShapedRecipe(ItemsPMX.STRONG_ENHANCER_RUNE.get())
                 .patternLine(" # ")
                 .patternLine("PW#")
                 .patternLine("#P ")
@@ -124,8 +118,8 @@ public class RecipesPMX extends RecipeProvider {
                 .key('W', ItemsPMX.WEAK_ENHANCER_RUNE.get())
                 .requiredResearch(ResearchEntriesPMX.STRONG_ENHANCER_RUNE)
                 .manaCost(SourceList.EMPTY.add(Sources.INFERNAL, 750))
-                .build(output);
-        ArcaneShapedRecipeBuilder.arcaneShapedRecipe(this.itemGetter, ItemsPMX.INFINITY_RUNE.get())
+                .build(portalOutput);
+        ArcaneShapedRecipeBuilder.arcaneShapedRecipe(ItemsPMX.INFINITY_RUNE.get())
                 .patternLine("#PP")
                 .patternLine("PnP")
                 .patternLine("PP#")
@@ -134,8 +128,8 @@ public class RecipesPMX extends RecipeProvider {
                 .key('n', Items.NETHERITE_INGOT)
                 .requiredResearch(ResearchEntriesPMX.INFINITY_RUNE)
                 .manaCost(SourceList.EMPTY.add(Sources.VOID, 750).add(Sources.INFERNAL, 750))
-                .build(output);
-        ArcaneShapedRecipeBuilder.arcaneShapedRecipe(this.itemGetter, ItemsPMX.GATE_RUNE.get())
+                .build(portalOutput);
+        ArcaneShapedRecipeBuilder.arcaneShapedRecipe(ItemsPMX.GATE_RUNE.get())
                 .patternLine("##T")
                 .patternLine("#A#")
                 .patternLine("T##")
@@ -144,8 +138,8 @@ public class RecipesPMX extends RecipeProvider {
                 .key('A', Items.AMETHYST_SHARD)
                 .requiredResearch(ResearchEntriesPMX.GATE_RUNE)
                 .manaCost(SourceList.EMPTY.add(Sources.VOID, 750))
-                .build(output);
-        ArcaneShapedRecipeBuilder.arcaneShapedRecipe(this.itemGetter, ItemsPMX.HASTE_RUNE.get())
+                .build(portalOutput);
+        ArcaneShapedRecipeBuilder.arcaneShapedRecipe(ItemsPMX.HASTE_RUNE.get())
                 .patternLine("#  ")
                 .patternLine("#R#")
                 .patternLine(" A#")
@@ -154,6 +148,6 @@ public class RecipesPMX extends RecipeProvider {
                 .key('A', Items.AMETHYST_SHARD)
                 .requiredResearch(ResearchEntriesPMX.HASTE_RUNE)
                 .manaCost(SourceList.EMPTY.add(Sources.VOID, 750).add(Sources.INFERNAL, 750))
-                .build(output);
+                .build(portalOutput);
     }
 }

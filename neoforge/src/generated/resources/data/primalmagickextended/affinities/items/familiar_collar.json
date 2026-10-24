@@ -1,13 +1,11 @@
 {
-  "type": "primalmagick:item",
+  "type": "item",
   "set": {
-    "sources": {
-      "primalmagick:blood": 4,
-      "primalmagick:earth": 1,
-      "primalmagick:infernal": 4,
-      "primalmagick:sea": 1,
-      "primalmagick:sky": 1
-    }
+    "primalmagick:blood": 4,
+    "primalmagick:earth": 1,
+    "primalmagick:infernal": 4,
+    "primalmagick:sea": 1,
+    "primalmagick:sky": 1
   },
   "target": "primalmagickextended:familiar_collar"
 }

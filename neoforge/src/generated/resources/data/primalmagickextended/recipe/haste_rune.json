@@ -5,12 +5,17 @@
       "feature": "portals"
     }
   ],
-  "type": "primalmagick:shaped_arcane",
-  "category": "arcane",
+  "type": "primalmagick:arcane_crafting_shaped",
   "key": {
-    "#": "minecraft:feather",
-    "A": "minecraft:amethyst_shard",
-    "R": "minecraft:rabbit_foot"
+    "#": {
+      "item": "minecraft:feather"
+    },
+    "A": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "R": {
+      "item": "minecraft:rabbit_foot"
+    }
   },
   "mana": {
     "sources": {
@@ -31,6 +36,7 @@
     }
   },
   "result": {
+    "count": 1,
     "id": "primalmagickextended:haste_rune"
   }
 }

@@ -7,11 +7,10 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.block.Block;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.function.Consumer;
+import java.util.List;
 import java.util.function.IntSupplier;
 
 /**
@@ -29,13 +28,21 @@ public class RuneBlockItem extends BlockItem {
         this.rangeArgument = rangeArgument;
     }
 
+    /**
+     * The item's own {@code item.primalmagickextended.<id>} key. A block item would otherwise use its block's key,
+     * and the rune items are named apart from their blocks.
+     */
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display,
-                                Consumer<Component> tooltip, TooltipFlag flag) {
-        super.appendHoverText(stack, context, display, tooltip, flag);
+    public String getDescriptionId() {
+        return this.getOrCreateDescriptionId();
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag) {
+        super.appendHoverText(stack, context, tooltip, flag);
         MutableComponent line = rangeArgument == null
                 ? Component.translatable(tooltipKey)
                 : Component.translatable(tooltipKey, rangeArgument.getAsInt());
-        tooltip.accept(line.withStyle(ChatFormatting.GRAY));
+        tooltip.add(line.withStyle(ChatFormatting.GRAY));
     }
 }

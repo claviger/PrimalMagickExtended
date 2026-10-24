@@ -1,9 +1,0 @@
-{
-  "type": "minecraft:function",
-  "environment": "minecraft:default",
-  "function": "primalmagickextended:commands_require_game_master_permission_and_accept_targets_and_alias",
-  "max_attempts": 3,
-  "max_ticks": 400,
-  "setup_ticks": 50,
-  "structure": "primalmagick:test/floor5x5x5"
-}

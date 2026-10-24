@@ -3,6 +3,7 @@ package com.claviger.primalmagickextended.common.familiars;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
 
@@ -20,7 +21,7 @@ import java.util.UUID;
  */
 public record StoredFamiliar(EntityType<?> type, CompoundTag entityData, UUID generation, Optional<UUID> activeEntityId) {
     public static final Codec<StoredFamiliar> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-            EntityType.CODEC.fieldOf("type").forGetter(StoredFamiliar::type),
+            BuiltInRegistries.ENTITY_TYPE.byNameCodec().fieldOf("type").forGetter(StoredFamiliar::type),
             CompoundTag.CODEC.fieldOf("entityData").forGetter(StoredFamiliar::entityData),
             UUIDUtil.CODEC.fieldOf("generation").forGetter(StoredFamiliar::generation),
             UUIDUtil.CODEC.optionalFieldOf("activeEntityId").forGetter(StoredFamiliar::activeEntityId)

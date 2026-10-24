@@ -20,9 +20,7 @@ import com.verdantartifice.primalmagick.common.stats.ExpertiseManager;
 import com.verdantartifice.primalmagick.common.wands.WandCap;
 import com.verdantartifice.primalmagick.common.wands.WandCore;
 import com.verdantartifice.primalmagick.common.wands.WandGem;
-import com.verdantartifice.primalmagick.test.AbstractBaseTest;
-import com.verdantartifice.primalmagick.test.TestUtils;
-import com.verdantartifice.primalmagick.test.spells.SpellPayloadTests;
+import com.claviger.primalmagickextended.test.AbstractBaseTestPMX;
 import io.netty.buffer.Unpooled;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -34,9 +32,8 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.animal.wolf.Wolf;
+import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.BlockHitResult;
@@ -46,9 +43,9 @@ import net.minecraft.world.phys.Vec3;
 /**
  * Tests for the Find Familiar spell payload.
  */
-public class FindFamiliarPayloadTests extends AbstractBaseTest {
-    private static final Vec3 PLAYER_POS = new Vec3(2.5D, 1.0D, 2.5D);
-    private static final Vec3 PET_POS = new Vec3(1.5D, 1.0D, 1.5D);
+public class FindFamiliarPayloadTests extends AbstractBaseTestPMX {
+    private static final Vec3 PLAYER_POS = new Vec3(2.5D, 2.0D, 2.5D);
+    private static final Vec3 PET_POS = new Vec3(1.5D, 2.0D, 1.5D);
 
     private static ServerPlayer caster(GameTestHelper helper) {
         ServerPlayer player = FamiliarTestUtils.placePlayer(helper, makeMockServerPlayer(helper, true), PLAYER_POS);
@@ -64,7 +61,7 @@ public class FindFamiliarPayloadTests extends AbstractBaseTest {
     }
 
     private static void castOnSelf(GameTestHelper helper, ServerPlayer caster) {
-        SpellPayloadTests.execute(helper, selfSpell(), new EntityHitResult(caster, caster.getEyePosition()), caster);
+        FamiliarTestUtils.executePayload(helper, selfSpell(), new EntityHitResult(caster, caster.getEyePosition()), caster);
     }
 
     public static void find_familiar_payload_is_registered(GameTestHelper helper) {
@@ -117,7 +114,7 @@ public class FindFamiliarPayloadTests extends AbstractBaseTest {
         int expertiseBefore = ExpertiseManager.getValue(player, ResearchDisciplines.SORCERY).orElseThrow();
         Wolf wolf = FamiliarTestUtils.bindWolf(helper, player, PET_POS);
 
-        ItemStack wandStack = TestUtils.makeModularCaster(ItemsPM.MODULAR_WAND.get(), WandCore.HEARTWOOD, WandCap.IRON, WandGem.APPRENTICE);
+        ItemStack wandStack = FamiliarTestUtils.makeModularCaster(ItemsPM.MODULAR_WAND.get(), WandCore.HEARTWOOD, WandCap.IRON, WandGem.APPRENTICE);
         AbstractWandItem wand = assertInstanceOf(helper, wandStack.getItem(), AbstractWandItem.class, "Wand stack is not a wand");
         Sources.getAll().forEach(s -> wand.addMana(wandStack, s, wand.getMaxMana(wandStack, s)));
         player.setItemInHand(InteractionHand.MAIN_HAND, wandStack);
@@ -125,8 +122,8 @@ public class FindFamiliarPayloadTests extends AbstractBaseTest {
         assertTrue(helper, wand.setActiveSpellIndex(wandStack, 0), "Spell was not set to active");
 
         int maxBlood = wand.getMaxMana(wandStack, Sources.BLOOD);
-        InteractionResult result = wand.use(helper.getLevel(), player, InteractionHand.MAIN_HAND);
-        assertTrue(helper, result.consumesAction(), "Wand use result was not a success");
+        var result = wand.use(helper.getLevel(), player, InteractionHand.MAIN_HAND);
+        assertTrue(helper, result.getResult().consumesAction(), "Wand use result was not a success");
         int expectedBlood = maxBlood - wand.getModifiedCost(wandStack, player, Sources.BLOOD, 2000, helper.getLevel().registryAccess());
         assertValueEqual(helper, expectedBlood, wand.getMana(wandStack, Sources.BLOOD), "Blood mana after cast");
         assertTrue(helper, wolf.isRemoved(), "Wand cast did not dismiss the familiar");
@@ -144,11 +141,11 @@ public class FindFamiliarPayloadTests extends AbstractBaseTest {
                 .primaryMod().type(MineSpellMod.INSTANCE).with(SpellPropertiesPM.NON_ZERO_DURATION.get(), 1).end()
                 .build();
         // A pig on a mine away from the caster and the familiar triggers it once it arms
-        Vec3 minePoint = helper.absoluteVec(new Vec3(3.5D, 1.0D, 0.5D));
-        helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(3.5D, 1.0D, 0.5D));
+        Vec3 minePoint = helper.absoluteVec(new Vec3(3.5D, 2.0D, 0.5D));
+        helper.spawnWithNoFreeWill(EntityType.PIG, new Vec3(3.5D, 2.0D, 0.5D));
         BlockHitResult hit = new BlockHitResult(minePoint, Direction.UP, BlockPos.containing(minePoint), false);
-        SpellManager.executeSpellPayload(mineSpell, hit, helper.getLevel(), caster, SpellPayloadTests.scrollSource(), true, null);
-        BlockPos minePos = new BlockPos(3, 1, 0);
+        SpellManager.executeSpellPayload(mineSpell, hit, helper.getLevel(), caster, FamiliarTestUtils.scrollSource(), true, null);
+        BlockPos minePos = new BlockPos(3, 2, 0);
         assertValueEqual(helper, 1, helper.getEntities(EntityTypesPM.SPELL_MINE.get(), minePos, 1.0D).size(), "Mines after cast");
         assertFalse(helper, wolf.isRemoved(), "Placing the mine toggled the familiar");
         helper.succeedWhen(() -> {
@@ -166,7 +163,7 @@ public class FindFamiliarPayloadTests extends AbstractBaseTest {
         SpellPackage decoded = SpellPackage.codec().parse(ops, encoded).getOrThrow();
         assertTrue(helper, decoded.payload().getComponent() == FindFamiliarSpellPayload.INSTANCE, "Codec round trip lost the payload instance");
 
-        RegistryFriendlyByteBuf buf = new RegistryFriendlyByteBuf(Unpooled.buffer(), registryAccess);
+        RegistryFriendlyByteBuf buf = registryBuffer(Unpooled.buffer(), registryAccess);
         try {
             SpellPackage.streamCodec().encode(buf, spell);
             SpellPackage streamed = SpellPackage.streamCodec().decode(buf);

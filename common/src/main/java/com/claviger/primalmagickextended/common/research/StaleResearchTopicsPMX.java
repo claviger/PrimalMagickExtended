@@ -44,7 +44,7 @@ public final class StaleResearchTopicsPMX {
      */
     @VisibleForTesting
     public static boolean clear(IPlayerKnowledge knowledge, RegistryAccess registryAccess) {
-        Registry<ResearchEntry> entries = registryAccess.lookupOrThrow(RegistryKeysPM.RESEARCH_ENTRIES);
+        Registry<ResearchEntry> entries = registryAccess.registryOrThrow(RegistryKeysPM.RESEARCH_ENTRIES);
         Predicate<AbstractResearchTopic<?>> stale = topic -> topic instanceof EntryResearchTopic entryTopic && !entries.containsKey(entryTopic.getEntry().getRootKey());
         boolean cleared = false;
         if (stale.test(knowledge.getLastResearchTopic())) {

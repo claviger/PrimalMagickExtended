@@ -9,14 +9,14 @@ import commonnetwork.networking.data.Side;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * Packet sent from the server to tell a client which portal colour, as a map colour id, to use for the loading
  * screen background during portal travel. An id of zero clears the background. Ported from Custom Portals.
  */
 public class DrawSpritePacket implements IMessageToClient {
-    public static final Identifier CHANNEL = ResourceUtilsPMX.loc("draw_sprite");
+    public static final ResourceLocation CHANNEL = ResourceUtilsPMX.loc("draw_sprite");
     public static final StreamCodec<RegistryFriendlyByteBuf, DrawSpritePacket> STREAM_CODEC = StreamCodec.ofMember(DrawSpritePacket::encode, DrawSpritePacket::decode);
 
     protected final int colorId;

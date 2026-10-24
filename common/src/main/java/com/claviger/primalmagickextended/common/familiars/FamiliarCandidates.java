@@ -2,14 +2,11 @@ package com.claviger.primalmagickextended.common.familiars;
 
 import com.claviger.primalmagickextended.common.tags.EntityTypeTagsPMX;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityReference;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.TamableAnimal;
-import net.minecraft.world.entity.animal.equine.AbstractHorse;
-import net.minecraft.world.entity.animal.fox.Fox;
+import net.minecraft.world.entity.animal.Fox;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
 import net.minecraft.world.entity.player.Player;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -20,21 +17,22 @@ import java.util.UUID;
 public class FamiliarCandidates {
     /** True if the entity is a mob whose type is in the familiar_candidates tag. */
     public static boolean isCandidateType(Entity entity) {
-        return entity instanceof Mob && entity.is(EntityTypeTagsPMX.FAMILIAR_CANDIDATES);
+        return entity instanceof Mob && entity.getType().is(EntityTypeTagsPMX.FAMILIAR_CANDIDATES);
     }
 
     /**
      * True if the mob is tamed by the player (tamable animals and horse-likes) or, for foxes, trusts
-     * the player. Uses server-side ownership data; see {@link #looksOwnedOnClient} for the client.
+     * the player. Compares owner UUIDs rather than resolving the owner, so offline owners still count.
+     * Uses server-side ownership data; see {@link #looksOwnedOnClient} for the client.
      */
     public static boolean isOwnedBy(Mob mob, Player player) {
         UUID playerId = player.getUUID();
         if (mob instanceof TamableAnimal tamable) {
-            return tamable.isTame() && matches(tamable.getOwnerReference(), playerId);
+            return tamable.isTame() && playerId.equals(tamable.getOwnerUUID());
         } else if (mob instanceof AbstractHorse horse) {
-            return horse.isTamed() && matches(horse.getOwnerReference(), playerId);
+            return horse.isTamed() && playerId.equals(horse.getOwnerUUID());
         } else if (mob instanceof Fox fox) {
-            return fox.trusts(player);   // made public by the access transformer
+            return fox.trusts(playerId);   // made public by the access transformer
         } else {
             return false;
         }
@@ -48,11 +46,11 @@ public class FamiliarCandidates {
      */
     public static boolean looksOwnedOnClient(Mob mob, Player player) {
         if (mob instanceof TamableAnimal tamable) {
-            return tamable.isTame() && matches(tamable.getOwnerReference(), player.getUUID());
+            return tamable.isTame() && player.getUUID().equals(tamable.getOwnerUUID());
         } else if (mob instanceof AbstractHorse horse) {
             return horse.isTamed();
         } else if (mob instanceof Fox fox) {
-            return fox.trusts(player);
+            return fox.trusts(player.getUUID());
         } else {
             return false;
         }
@@ -65,10 +63,5 @@ public class FamiliarCandidates {
      */
     public static boolean isEligible(Player player, Entity target) {
         return isCandidateType(target) && target instanceof Mob mob && isOwnedBy(mob, player);
-    }
-
-    /** Compares by UUID rather than resolving the owner, so offline owners still count. */
-    private static boolean matches(@Nullable EntityReference<LivingEntity> reference, UUID playerId) {
-        return reference != null && playerId.equals(reference.getUUID());
     }
 }

@@ -2,18 +2,21 @@ package com.claviger.primalmagickextended.datagen;
 
 import com.claviger.primalmagickextended.ConstantsPMX;
 import com.claviger.primalmagickextended.datagen.affinities.AffinityProviderPMX;
+import com.claviger.primalmagickextended.datagen.blocks.BlockStateProviderPMXNeoforge;
+import com.claviger.primalmagickextended.datagen.items.ItemModelProviderPMXNeoforge;
 import com.claviger.primalmagickextended.datagen.lang.LanguageProviderEnUsPMX;
 import com.claviger.primalmagickextended.datagen.loot_tables.BlockLootTablesPMX;
-import com.claviger.primalmagickextended.datagen.models.ModelProviderPMXNeoforge;
 import com.claviger.primalmagickextended.datagen.particles.ParticleDescriptionProviderPMXNeoforge;
 import com.claviger.primalmagickextended.datagen.recipes.RecipesPMXNeoforge;
 import com.claviger.primalmagickextended.datagen.tags.EntityTypeTagsProviderPMXNeoforge;
 import com.claviger.primalmagickextended.datagen.tags.ResearchEntryTagsProviderPMXNeoforge;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.LootTableProvider;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 import java.util.Collections;
@@ -23,40 +26,30 @@ import java.util.concurrent.CompletableFuture;
 /**
  * Handlers for events related to data file generation.
  */
-@EventBusSubscriber(modid = ConstantsPMX.MOD_ID)
+@EventBusSubscriber(modid = ConstantsPMX.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class DataGeneratorsPMXNeoforge {
     @SubscribeEvent
-    public static void onGatherClientData(GatherDataEvent.Client event) {
-        // A client data run generates both client and server data
+    public static void gatherData(GatherDataEvent event) {
+        // Add all of the mod's data providers to the generator for processing
         DataGenerator generator = event.getGenerator();
-        CompletableFuture<HolderLookup.Provider> registryLookupFuture = addRegistryProviders(event, generator);
-        addClientProviders(event, generator, registryLookupFuture);
-        addServerProviders(event, generator, registryLookupFuture);
-    }
+        PackOutput output = generator.getPackOutput();
+        ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
+        CompletableFuture<HolderLookup.Provider> registryLookupFuture = RegistryDataGeneratorPMXNeoforge.addProviders(event.includeServer(), generator, output, event.getLookupProvider());
 
-    @SubscribeEvent
-    public static void onGatherServerData(GatherDataEvent.Server event) {
-        DataGenerator generator = event.getGenerator();
-        CompletableFuture<HolderLookup.Provider> registryLookupFuture = addRegistryProviders(event, generator);
-        addServerProviders(event, generator, registryLookupFuture);
-    }
+        // Shared by all features
+        generator.addProvider(event.includeClient(), new BlockStateProviderPMXNeoforge(output, existingFileHelper));
+        generator.addProvider(event.includeClient(), new ItemModelProviderPMXNeoforge(output, existingFileHelper));
+        generator.addProvider(event.includeClient(), new LanguageProviderEnUsPMX(output));
+        generator.addProvider(event.includeServer(), new RecipesPMXNeoforge(output, registryLookupFuture));
 
-    private static CompletableFuture<HolderLookup.Provider> addRegistryProviders(GatherDataEvent event, DataGenerator generator) {
-        return RegistryDataGeneratorPMXNeoforge.addProviders(true, generator, generator.getPackOutput(), event.getLookupProvider());
-    }
+        // Familiars
+        generator.addProvider(event.includeServer(), new AffinityProviderPMX(output, registryLookupFuture));
+        generator.addProvider(event.includeServer(), new EntityTypeTagsProviderPMXNeoforge(output, registryLookupFuture, existingFileHelper));
 
-    private static void addClientProviders(GatherDataEvent event, DataGenerator generator, CompletableFuture<HolderLookup.Provider> registryLookupFuture) {
-        event.addProvider(new ModelProviderPMXNeoforge(generator.getPackOutput()));
-        event.addProvider(new LanguageProviderEnUsPMX(generator.getPackOutput()));
-        event.addProvider(new ParticleDescriptionProviderPMXNeoforge(generator.getPackOutput()));
-    }
-
-    private static void addServerProviders(GatherDataEvent event, DataGenerator generator, CompletableFuture<HolderLookup.Provider> registryLookupFuture) {
-        event.addProvider(new RecipesPMXNeoforge.Runner(generator.getPackOutput(), registryLookupFuture));
-        event.addProvider(new AffinityProviderPMX(generator.getPackOutput(), registryLookupFuture));
-        event.addProvider(new EntityTypeTagsProviderPMXNeoforge(generator.getPackOutput(), registryLookupFuture));
-        event.addProvider(new ResearchEntryTagsProviderPMXNeoforge(generator.getPackOutput(), registryLookupFuture));
-        event.addProvider(new LootTableProvider(generator.getPackOutput(), Collections.emptySet(), List.of(
+        // Portals
+        generator.addProvider(event.includeClient(), new ParticleDescriptionProviderPMXNeoforge(output, existingFileHelper));
+        generator.addProvider(event.includeServer(), new ResearchEntryTagsProviderPMXNeoforge(output, registryLookupFuture, existingFileHelper));
+        generator.addProvider(event.includeServer(), new LootTableProvider(output, Collections.emptySet(), List.of(
                 BlockLootTablesPMX.getSubProviderEntry()), registryLookupFuture));
     }
 }

@@ -1,9 +1,0 @@
-{
-  "type": "minecraft:function",
-  "environment": "minecraft:default",
-  "function": "primalmagickextended:stale_generation_familiar_is_removed_on_join",
-  "max_attempts": 3,
-  "max_ticks": 400,
-  "setup_ticks": 50,
-  "structure": "primalmagick:test/floor5x5x5"
-}

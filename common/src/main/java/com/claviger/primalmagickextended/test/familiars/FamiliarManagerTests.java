@@ -5,20 +5,19 @@ import com.claviger.primalmagickextended.common.familiars.FamiliarBinding;
 import com.claviger.primalmagickextended.common.familiars.FamiliarManager;
 import com.claviger.primalmagickextended.common.familiars.StoredFamiliar;
 import com.claviger.primalmagickextended.platform.ServicesPMX;
-import com.verdantartifice.primalmagick.test.AbstractBaseTest;
-import com.verdantartifice.primalmagick.test.util.RecordingServerPlayer;
+import com.claviger.primalmagickextended.test.AbstractBaseTestPMX;
+import com.claviger.primalmagickextended.test.util.RecordingServerPlayerPMX;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.animal.equine.Horse;
-import net.minecraft.world.entity.animal.sheep.Sheep;
+import net.minecraft.world.entity.animal.horse.Horse;
+import net.minecraft.world.entity.animal.Sheep;
 import net.minecraft.world.entity.decoration.ArmorStand;
-import net.minecraft.world.entity.animal.wolf.Wolf;
+import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
@@ -31,9 +30,9 @@ import java.util.UUID;
 /**
  * Tests for the familiar manager's bind, dismiss, summon and toggle operations.
  */
-public class FamiliarManagerTests extends AbstractBaseTest {
-    private static final Vec3 PLAYER_POS = new Vec3(2.5D, 1.0D, 2.5D);
-    private static final Vec3 PET_POS = new Vec3(1.5D, 1.0D, 1.5D);
+public class FamiliarManagerTests extends AbstractBaseTestPMX {
+    private static final Vec3 PLAYER_POS = new Vec3(2.5D, 2.0D, 2.5D);
+    private static final Vec3 PET_POS = new Vec3(1.5D, 2.0D, 1.5D);
 
     private static ServerPlayer survivalPlayer(GameTestHelper helper) {
         ServerPlayer player = FamiliarTestUtils.placePlayer(helper, makeMockServerPlayer(helper, true), PLAYER_POS);
@@ -82,7 +81,7 @@ public class FamiliarManagerTests extends AbstractBaseTest {
         assertTrue(helper, wolf.isRemoved(), "Wolf still in world after dismissal");
         StoredFamiliar stored = data(player).getStored().orElseThrow();
         assertTrue(helper, stored.activeEntityId().isEmpty(), "Active entity id not cleared");
-        assertTrue(helper, stored.entityData().getString("CustomName").isPresent(), "Snapshot lacks the custom name");
+        assertTrue(helper, stored.entityData().contains("CustomName"), "Snapshot lacks the custom name");
         assertTrue(helper, FamiliarManager.findActive(player).isEmpty(), "Active familiar found after dismissal");
         helper.succeedWhen(() -> helper.assertEntityNotPresent(EntityType.WOLF));
     }
@@ -91,7 +90,7 @@ public class FamiliarManagerTests extends AbstractBaseTest {
         ServerPlayer player = survivalPlayer(helper);
         Wolf wolf = FamiliarTestUtils.bindWolf(helper, player, PET_POS);
         wolf.setCustomName(Component.literal("Fluffy"));
-        wolf.setComponent(DataComponents.WOLF_COLLAR, DyeColor.RED);
+        FamiliarTestUtils.setCollarColor(wolf, DyeColor.RED);
         wolf.setHealth(1.0F);
         UUID oldUuid = wolf.getUUID();
         UUID oldGeneration = data(player).getStored().orElseThrow().generation();
@@ -99,13 +98,13 @@ public class FamiliarManagerTests extends AbstractBaseTest {
 
         assertTrue(helper, FamiliarManager.summon(player), "Summon failed");
         helper.succeedWhen(() -> {
-            List<Wolf> wolves = helper.getEntities(EntityType.WOLF, new BlockPos(2, 1, 2), 2.0D);
+            List<Wolf> wolves = helper.getEntities(EntityType.WOLF, new BlockPos(2, 2, 2), 2.0D);
             assertValueEqual(helper, 1, wolves.size(), "Wolves beside the player");
             Wolf summoned = wolves.get(0);
             assertValueEqual(helper, "Fluffy", summoned.getCustomName().getString(), "Summoned wolf name");
             assertValueEqual(helper, DyeColor.RED, summoned.getCollarColor(), "Summoned wolf collar color");
             assertValueEqual(helper, summoned.getMaxHealth(), summoned.getHealth(), "Summoned wolf health");
-            assertTrue(helper, summoned.isTame() && summoned.getOwnerReference() != null && summoned.getOwnerReference().getUUID().equals(player.getUUID()), "Summoned wolf is not the player's pet");
+            assertTrue(helper, summoned.isTame() && player.getUUID().equals(summoned.getOwnerUUID()), "Summoned wolf is not the player's pet");
             assertFalse(helper, oldUuid.equals(summoned.getUUID()), "Summoned wolf reused the old UUID");
             FamiliarBinding binding = ServicesPMX.CAPABILITIES.binding(summoned).orElseThrow();
             assertFalse(helper, oldGeneration.equals(binding.generation()), "Summoned wolf reused the old generation");
@@ -158,7 +157,7 @@ public class FamiliarManagerTests extends AbstractBaseTest {
     }
 
     public static void summon_with_no_familiar_sends_message(GameTestHelper helper) {
-        RecordingServerPlayer player = RecordingServerPlayer.create(helper, false);
+        RecordingServerPlayerPMX player = RecordingServerPlayerPMX.create(helper, false);
         assertFalse(helper, FamiliarManager.summon(player), "Summon succeeded with no familiar");
         assertTrue(helper, player.hasSystemMessage("message.primalmagickextended.familiar.none"), "No 'none' message sent");
         helper.succeed();
@@ -168,9 +167,9 @@ public class FamiliarManagerTests extends AbstractBaseTest {
         ServerPlayer player = survivalPlayer(helper);
         Horse horse = helper.spawnWithNoFreeWill(EntityType.HORSE, PET_POS);
         horse.setTamed(true);
-        horse.setOwner(player);
+        horse.setOwnerUUID(player.getUUID());
         assertTrue(helper, FamiliarManager.bind(player, horse, FamiliarTestUtils.collar()), "Bind failed");
-        assertTrue(helper, player.startRiding(horse, true, false), "Player could not mount the horse");
+        assertTrue(helper, player.startRiding(horse, true), "Player could not mount the horse");
         FamiliarManager.dismiss(player, horse);
         assertFalse(helper, player.isPassenger(), "Player still riding after dismissal");
         assertTrue(helper, horse.isRemoved(), "Horse still present after dismissal");
@@ -181,9 +180,9 @@ public class FamiliarManagerTests extends AbstractBaseTest {
         ServerPlayer player = survivalPlayer(helper);
         Horse horse = helper.spawnWithNoFreeWill(EntityType.HORSE, PET_POS);
         horse.setTamed(true);
-        horse.setOwner(player);
+        horse.setOwnerUUID(player.getUUID());
         ArmorStand rider = helper.spawn(EntityType.ARMOR_STAND, PET_POS);
-        assertTrue(helper, rider.startRiding(horse, true, false), "Armor stand could not mount the horse");
+        assertTrue(helper, rider.startRiding(horse, true), "Armor stand could not mount the horse");
         assertTrue(helper, FamiliarTestUtils.snapshot(horse).contains("Passengers"), "Raw save lacks the rider, so this test proves nothing");
         assertTrue(helper, FamiliarManager.bind(player, horse, FamiliarTestUtils.collar()), "Bind failed");
         assertFalse(helper, data(player).getStored().orElseThrow().entityData().contains("Passengers"), "Snapshot kept the rider");

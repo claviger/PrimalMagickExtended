@@ -1,9 +1,0 @@
-{
-  "type": "minecraft:function",
-  "environment": "minecraft:default",
-  "function": "primalmagickextended:clear_command_restores_dismissed_familiar_as_ordinary_pet",
-  "max_attempts": 3,
-  "max_ticks": 400,
-  "setup_ticks": 50,
-  "structure": "primalmagick:test/floor5x5x5"
-}

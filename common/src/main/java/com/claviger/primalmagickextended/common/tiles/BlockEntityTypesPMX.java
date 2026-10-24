@@ -9,7 +9,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 /**
  * Deferred registry for the mod's block entity types.
@@ -22,7 +21,7 @@ public class BlockEntityTypesPMX {
 
     /** Shared by all sixteen portal blocks; ticks the portal's lit state. */
     public static final IRegistryItem<BlockEntityType<?>, BlockEntityType<PortalBlockEntity>> PORTAL = register("portal_block_entity",
-            () -> new BlockEntityType<>(PortalBlockEntity::new, BlocksPMX.portals().stream().map(item -> (Block) item.get()).collect(Collectors.toUnmodifiableSet())));
+            () -> BlockEntityType.Builder.of(PortalBlockEntity::new, BlocksPMX.portals().stream().map(item -> (Block) item.get()).toArray(Block[]::new)).build(null));
 
     private static <T extends BlockEntity> IRegistryItem<BlockEntityType<?>, BlockEntityType<T>> register(String name, Supplier<BlockEntityType<T>> supplier) {
         return ServicesPMX.BLOCK_ENTITY_TYPES_REGISTRY.register(name, supplier);

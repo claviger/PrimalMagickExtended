@@ -5,12 +5,17 @@
       "feature": "portals"
     }
   ],
-  "type": "primalmagick:shaped_arcane",
-  "category": "arcane",
+  "type": "primalmagick:arcane_crafting_shaped",
   "key": {
-    "#": "minecraft:prismarine_shard",
-    "P": "minecraft:prismarine_crystals",
-    "W": "primalmagickextended:weak_enhancer_rune"
+    "#": {
+      "item": "minecraft:prismarine_shard"
+    },
+    "P": {
+      "item": "minecraft:prismarine_crystals"
+    },
+    "W": {
+      "item": "primalmagickextended:weak_enhancer_rune"
+    }
   },
   "mana": {
     "sources": {
@@ -30,6 +35,7 @@
     }
   },
   "result": {
+    "count": 1,
     "id": "primalmagickextended:strong_enhancer_rune"
   }
 }

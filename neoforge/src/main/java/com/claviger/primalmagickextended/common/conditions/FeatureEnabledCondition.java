@@ -43,8 +43,8 @@ public final class FeatureEnabledCondition implements ICondition {
 
     /**
      * Holds if the feature is turned on. The exception is a condition read without any condition context. That only
-     * happens in {@code NetworkRegistryLoadTask}, when a client decodes, from its own copy of the mod's data, the
-     * research entries a server listed for it: it parses with plain {@code RegistryOps}, for which
+     * happens in {@code RegistryDataLoader.loadContentsFromNetwork}, when a client decodes, from its own copy of the
+     * mod's data, the research entries a server listed for it: it parses with plain {@code RegistryOps}, for which
      * {@link net.neoforged.neoforge.common.conditions.ConditionalOps#retrieveContext()} yields
      * {@link IContext#EMPTY}, whereas server-side data pack loading always supplies a context. The server already
      * left out the entries of its disabled features, so the client keeps every listed entry whatever its own config

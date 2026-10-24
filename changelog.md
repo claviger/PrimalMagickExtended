@@ -1,3 +1,10 @@
+v0.2.0+1.21.1
+-------------
+* Backport of 0.2.0 to Minecraft 1.21.1 / NeoForge 21.1 / Primal Magick 6.0.7
+* Requires NeoForge 21.1.132 or later, the official Primal Magick 6.0.7 release or later, and Common Networking
+* Nautiluses and zombie nautiluses cannot be familiars, since they do not exist in Minecraft 1.21.1
+* Portal data is saved in the world's data/primalmagickextended_portals.dat
+
 v0.2.0
 ------
 * Added Portal Travel (Manaweaving, expert tier): craft Portal Catalysts at the Arcane Workbench and use one inside a closed frame of any single block to open a coloured portal

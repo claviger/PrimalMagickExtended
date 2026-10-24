@@ -31,23 +31,23 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class LocalPlayerMixin extends AbstractClientPlayer {
     @Final
     @Shadow
-    private Minecraft minecraft;
+    protected Minecraft minecraft;
     @Shadow
-    public float oPortalEffectIntensity;
+    public float oSpinningEffectIntensity;
     @Shadow
-    public float portalEffectIntensity;
+    public float spinningEffectIntensity;
 
     public LocalPlayerMixin(Minecraft minecraftClient, ClientLevel clientWorld, ClientPacketListener clientPlayNetworkHandler, StatsCounter statHandler, ClientRecipeBook clientRecipeBook, boolean bl, boolean bl2) {
         super(clientWorld, clientPlayNetworkHandler.getLocalGameProfile());
     }
 
-    @Inject(method = "handlePortalTransitionEffect", at = @At("HEAD"), cancellable = true)
-    private void primalmagickextended$handlePortalTransitionEffect(CallbackInfo ci) {
+    @Inject(method = "handleConfusionTransitionEffect(Z)V", at = @At("HEAD"), cancellable = true)
+    private void primalmagickextended$handleConfusionTransitionEffect(boolean useConfusion, CallbackInfo ci) {
         IPortalTraveler traveler = (IPortalTraveler) this;
         CustomPortal portal = traveler.primalmagickextended$getDestPortal();
         float f = 0.0F;
         if (traveler.primalmagickextended$isInCustomPortal() && portal != null && this.portalProcess != null) {
-            this.oPortalEffectIntensity = this.portalEffectIntensity;
+            this.oSpinningEffectIntensity = this.spinningEffectIntensity;
             if (this.minecraft.screen != null && !this.minecraft.screen.isPauseScreen() && !(this.minecraft.screen instanceof DeathScreen)) {
                 if (this.minecraft.screen instanceof AbstractContainerScreen) {
                     this.closeContainer();
@@ -56,18 +56,18 @@ public abstract class LocalPlayerMixin extends AbstractClientPlayer {
                 this.minecraft.setScreen((Screen) null);
             }
 
-            if (!ServicesPMX.CONFIG.portalsMuteTeleportSounds() && this.portalEffectIntensity == 0.0F && portal.getPlayerTeleportDelay() > 1) {
+            if (!ServicesPMX.CONFIG.portalsMuteTeleportSounds() && this.spinningEffectIntensity == 0.0F && portal.getPlayerTeleportDelay() > 1) {
                 this.minecraft.getSoundManager().play(SimpleSoundInstance.forLocalAmbience(SoundEvents.PORTAL_TRIGGER, this.random.nextFloat() * 0.4F + 0.8F, 0.25F));
             }
 
             f = 0.0125F;
             this.portalProcess.setAsInsidePortalThisTick(false);
             traveler.primalmagickextended$notInCustomPortal();
-            this.portalEffectIntensity = Mth.clamp(this.portalEffectIntensity + f, 0.0F, 1.0F);
+            this.spinningEffectIntensity = Mth.clamp(this.spinningEffectIntensity + f, 0.0F, 1.0F);
             this.processPortalCooldown();
             ci.cancel();
         }
-        if (this.oPortalEffectIntensity == 0.0F && traveler.primalmagickextended$getPortalColor() != 0) {
+        if (this.oSpinningEffectIntensity == 0.0F && traveler.primalmagickextended$getPortalColor() != 0) {
             traveler.primalmagickextended$setPortalColor(0);
         }
     }

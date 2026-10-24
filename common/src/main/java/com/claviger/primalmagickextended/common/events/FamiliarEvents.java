@@ -15,7 +15,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.animal.feline.Ocelot;
+import net.minecraft.world.entity.animal.Ocelot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -147,7 +147,7 @@ public class FamiliarEvents {
     /**
      * Stores an in-play familiar with the departing player so nothing is orphaned in the world. A parrot
      * familiar perched on the player's shoulder is put back into the world first so it is dismissed too.
-     * {@code ServerPlayer.removeEntitiesOnShoulder} ignores parrots that landed less than 20 ticks ago;
+     * {@code Player.removeEntitiesOnShoulder} ignores parrots that landed less than 20 ticks ago;
      * such a parrot stays on the shoulder and is saved with the player, which keeps it with its owner anyway.
      */
     public static void onPlayerLogout(ServerPlayer player) {

@@ -3,11 +3,11 @@ package com.claviger.primalmagickextended.test.features;
 import com.claviger.primalmagickextended.common.config.ConfigPMXNeoforge;
 import com.claviger.primalmagickextended.common.features.FeaturePMX;
 import com.claviger.primalmagickextended.common.util.ResourceUtilsPMX;
+import com.claviger.primalmagickextended.test.AbstractBaseTestPMX;
 import com.verdantartifice.primalmagick.common.capabilities.PlayerKnowledge;
 import com.verdantartifice.primalmagick.common.registries.RegistryKeysPM;
 import com.verdantartifice.primalmagick.common.research.keys.ResearchEntryKey;
 import com.verdantartifice.primalmagick.common.research.topics.EntryResearchTopic;
-import com.verdantartifice.primalmagick.test.AbstractBaseTest;
 import io.netty.buffer.Unpooled;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -18,7 +18,7 @@ import net.neoforged.neoforge.network.connection.ConnectionType;
  * NeoForge-side tests for the feature switches: the defaults declared in the config spec, and the knowledge sync
  * packet carrying research keys left behind by a disabled feature.
  */
-public class FeatureToggleNeoforgeTests extends AbstractBaseTest {
+public class FeatureToggleNeoforgeTests extends AbstractBaseTestPMX {
     public static void feature_switches_default_to_enabled(GameTestHelper helper) {
         assertValueEqual(helper, FeaturePMX.values().length, ConfigPMXNeoforge.FEATURES.size(), "Feature switch count");
         for (FeaturePMX feature : FeaturePMX.values()) {

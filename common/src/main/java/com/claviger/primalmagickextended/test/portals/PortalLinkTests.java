@@ -3,7 +3,7 @@ package com.claviger.primalmagickextended.test.portals;
 import com.claviger.primalmagickextended.common.portals.CustomPortal;
 import com.claviger.primalmagickextended.common.portals.PortalColor;
 import com.claviger.primalmagickextended.common.portals.PortalRegistry;
-import com.verdantartifice.primalmagick.test.AbstractBaseTest;
+import com.claviger.primalmagickextended.test.AbstractBaseTestPMX;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 
@@ -16,7 +16,7 @@ import java.util.UUID;
  * registry relinking. These are pure logic tests on {@link CustomPortal} objects and rely on the default server
  * config.
  */
-public class PortalLinkTests extends AbstractBaseTest {
+public class PortalLinkTests extends AbstractBaseTestPMX {
     private static final String OVERWORLD = "minecraft:overworld";
     private static final String NETHER = "minecraft:the_nether";
     private static final String END = "minecraft:the_end";

@@ -6,7 +6,9 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.EntityTypeTagsProvider;
 import net.minecraft.world.entity.EntityType;
+import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -14,8 +16,8 @@ import java.util.concurrent.CompletableFuture;
  * Data provider for the mod's entity type tags.
  */
 public class EntityTypeTagsProviderPMXNeoforge extends EntityTypeTagsProvider {
-    public EntityTypeTagsProviderPMXNeoforge(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider) {
-        super(packOutput, lookupProvider, ConstantsPMX.MOD_ID);
+    public EntityTypeTagsProviderPMXNeoforge(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider, @Nullable ExistingFileHelper existingFileHelper) {
+        super(packOutput, lookupProvider, ConstantsPMX.MOD_ID, existingFileHelper);
     }
 
     @Override
@@ -26,7 +28,8 @@ public class EntityTypeTagsProviderPMXNeoforge extends EntityTypeTagsProvider {
 
     @Override
     protected void addTags(@NotNull HolderLookup.Provider lookupProvider) {
+        // Minecraft 1.21.1 has no nautiluses, which later versions also list here
         this.tag(EntityTypeTagsPMX.FAMILIAR_CANDIDATES).add(EntityType.WOLF, EntityType.CAT, EntityType.PARROT, EntityType.HORSE, EntityType.DONKEY,
-                EntityType.MULE, EntityType.LLAMA, EntityType.TRADER_LLAMA, EntityType.NAUTILUS, EntityType.ZOMBIE_NAUTILUS, EntityType.FOX);
+                EntityType.MULE, EntityType.LLAMA, EntityType.TRADER_LLAMA, EntityType.FOX);
     }
 }

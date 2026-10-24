@@ -12,7 +12,7 @@ import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 /**
  * NeoForge listeners for client-only registration events.
  */
-@EventBusSubscriber(modid = ConstantsPMX.MOD_ID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = ConstantsPMX.MOD_ID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientRegistrationEventListenersPMX {
     /** Registers a tinted portal particle provider for every portal colour except purple, which has no particle of its own. */
     @SubscribeEvent

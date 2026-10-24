@@ -5,12 +5,17 @@
       "feature": "portals"
     }
   ],
-  "type": "primalmagick:shaped_arcane",
-  "category": "arcane",
+  "type": "primalmagick:arcane_crafting_shaped",
   "key": {
-    "#": "minecraft:weeping_vines",
-    "A": "minecraft:amethyst_shard",
-    "T": "minecraft:popped_chorus_fruit"
+    "#": {
+      "item": "minecraft:weeping_vines"
+    },
+    "A": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "T": {
+      "item": "minecraft:popped_chorus_fruit"
+    }
   },
   "mana": {
     "sources": {
@@ -30,6 +35,7 @@
     }
   },
   "result": {
+    "count": 1,
     "id": "primalmagickextended:gate_rune"
   }
 }

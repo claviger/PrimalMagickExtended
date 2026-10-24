@@ -10,7 +10,7 @@ import com.verdantartifice.primalmagick.common.research.ResearchDisciplines;
 import com.verdantartifice.primalmagick.common.research.ResearchEntries;
 import com.verdantartifice.primalmagick.common.research.ResearchEntry;
 import com.verdantartifice.primalmagick.common.research.ResearchStage;
-import com.verdantartifice.primalmagick.common.research.ResearchTiers;
+import com.verdantartifice.primalmagick.common.research.ResearchTier;
 import com.verdantartifice.primalmagick.common.sources.Sources;
 import net.minecraft.core.Holder;
 import net.minecraft.data.worldgen.BootstrapContext;
@@ -29,8 +29,11 @@ import java.util.function.Function;
  * loads while that feature is turned on.
  */
 public class ResearchEntriesPMX {
+    // Familiars
     public static final ResourceKey<ResearchEntry> FAMILIAR_COLLAR = create("familiar_collar");
     public static final ResourceKey<ResearchEntry> FIND_FAMILIAR = create("find_familiar");
+
+    // Portals
     public static final ResourceKey<ResearchEntry> PORTAL_TRAVEL = create("portal_travel");
     public static final ResourceKey<ResearchEntry> WEAK_ENHANCER_RUNE = create("weak_enhancer_rune");
     public static final ResourceKey<ResearchEntry> STRONG_ENHANCER_RUNE = create("strong_enhancer_rune");
@@ -54,8 +57,13 @@ public class ResearchEntriesPMX {
     }
 
     public static void bootstrap(BootstrapContext<ResearchEntry> context) {
+        registerFamiliarEntries(context);
+        registerPortalEntries(context);
+    }
+
+    private static void registerFamiliarEntries(BootstrapContext<ResearchEntry> context) {
         register(context, FAMILIAR_COLLAR, key -> new ResearchEntry.Builder(ConstantsPMX.MOD_ID, key)
-                .discipline(ResearchDisciplines.RITUAL).tier(ResearchTiers.EXPERT).icon(ItemsPMX.FAMILIAR_COLLAR.get())
+                .discipline(ResearchDisciplines.RITUAL).tier(ResearchTier.EXPERT).icon(ItemsPMX.FAMILIAR_COLLAR.get())
                 .parent(ResearchEntries.EXPERT_RITUAL).parent(ResearchEntries.RUNE_SUMMON).parent(ResearchEntries.RUNE_CREATURE)
                 .parent(ResearchEntries.RUNE_INFERNAL).parent(ResearchEntries.SPELL_PAYLOAD_POLYMORPH).parent(ResearchEntries.SPELL_PAYLOAD_HEALING)
                 .parent(ResearchEntries.INCENSE_BRAZIER).parent(ResearchEntries.RITUAL_BELL)
@@ -64,13 +72,12 @@ public class ResearchEntriesPMX {
                 .stage().recipe(ItemsPMX.FAMILIAR_COLLAR.get()).end()
                 .build());
         register(context, FIND_FAMILIAR, key -> new ResearchEntry.Builder(ConstantsPMX.MOD_ID, key)
-                .discipline(ResearchDisciplines.SORCERY).icon(Sources.BLOOD.getImageTexture())
+                .discipline(ResearchDisciplines.SORCERY).icon(Sources.BLOOD.getImage())
                 .parent(FAMILIAR_COLLAR)
                 .flags(ResearchEntry.Flags.builder().finaleExempt())
                 .stage().requiredTheories(2).end()
                 .stage().end()
                 .build());
-        registerPortalEntries(context);
     }
 
     /**
@@ -80,28 +87,28 @@ public class ResearchEntriesPMX {
      */
     private static void registerPortalEntries(BootstrapContext<ResearchEntry> context) {
         register(context, PORTAL_TRAVEL, key -> recipes(new ResearchEntry.Builder(ConstantsPMX.MOD_ID, key)
-                .discipline(ResearchDisciplines.MANAWEAVING).tier(ResearchTiers.EXPERT).icon(ItemsPMX.catalyst(PortalColor.GRAY))
+                .discipline(ResearchDisciplines.MANAWEAVING).tier(ResearchTier.EXPERT).icon(ItemsPMX.catalyst(PortalColor.GRAY))
                 .parent(ResearchEntries.EXPERT_MANAWEAVING).parent(ResearchEntries.DISCOVER_INFERNAL)
                 .flags(ResearchEntry.Flags.builder().finaleExempt())
                 .stage().requiredTheories(2).requiredItem(Items.ENDER_PEARL, 1).requiredItem(Items.ENDER_EYE, 1).end()
                 .stage().attunement(Sources.INFERNAL, 2), ItemsPMX.catalysts()).end()
                 .build());
         register(context, WEAK_ENHANCER_RUNE, key -> new ResearchEntry.Builder(ConstantsPMX.MOD_ID, key)
-                .discipline(ResearchDisciplines.RUNEWORKING).tier(ResearchTiers.EXPERT).icon(ItemsPMX.WEAK_ENHANCER_RUNE.get())
+                .discipline(ResearchDisciplines.RUNEWORKING).tier(ResearchTier.EXPERT).icon(ItemsPMX.WEAK_ENHANCER_RUNE.get())
                 .parent(PORTAL_TRAVEL).parent(ResearchEntries.EXPERT_RUNEWORKING).parent(ResearchEntries.DISCOVER_INFERNAL)
                 .flags(ResearchEntry.Flags.builder().finaleExempt())
                 .stage().requiredTheories(2).requiredItem(Items.AMETHYST_SHARD, 1).requiredItem(Items.LAPIS_LAZULI, 4).end()
                 .stage().attunement(Sources.INFERNAL, 2).recipe(ItemsPMX.WEAK_ENHANCER_RUNE.get()).end()
                 .build());
         register(context, STRONG_ENHANCER_RUNE, key -> new ResearchEntry.Builder(ConstantsPMX.MOD_ID, key)
-                .discipline(ResearchDisciplines.RUNEWORKING).tier(ResearchTiers.MASTER).icon(ItemsPMX.STRONG_ENHANCER_RUNE.get())
+                .discipline(ResearchDisciplines.RUNEWORKING).tier(ResearchTier.MASTER).icon(ItemsPMX.STRONG_ENHANCER_RUNE.get())
                 .parent(ResearchEntries.MASTER_RUNEWORKING).parent(WEAK_ENHANCER_RUNE).parent(ResearchEntries.WAND_GEM_WIZARD)
                 .flags(ResearchEntry.Flags.builder().finaleExempt())
                 .stage().requiredTheories(2).requiredItem(Items.PRISMARINE_SHARD, 2).requiredItem(Items.PRISMARINE_CRYSTALS, 2).end()
                 .stage().attunement(Sources.INFERNAL, 2).recipe(ItemsPMX.STRONG_ENHANCER_RUNE.get()).end()
                 .build());
         register(context, INFINITY_RUNE, key -> new ResearchEntry.Builder(ConstantsPMX.MOD_ID, key)
-                .discipline(ResearchDisciplines.RUNEWORKING).tier(ResearchTiers.MASTER).icon(ItemsPMX.INFINITY_RUNE.get())
+                .discipline(ResearchDisciplines.RUNEWORKING).tier(ResearchTier.MASTER).icon(ItemsPMX.INFINITY_RUNE.get())
                 .parent(ResearchEntries.SUPREME_RUNEWORKING).parent(STRONG_ENHANCER_RUNE).parent(ResearchEntries.WAND_GEM_WIZARD)
                 .parent(ResearchEntries.DISCOVER_VOID)
                 .flags(ResearchEntry.Flags.builder().finaleExempt())
@@ -109,7 +116,7 @@ public class ResearchEntriesPMX {
                 .stage().attunement(Sources.INFERNAL, 2).attunement(Sources.VOID, 2).recipe(ItemsPMX.INFINITY_RUNE.get()).end()
                 .build());
         register(context, GATE_RUNE, key -> new ResearchEntry.Builder(ConstantsPMX.MOD_ID, key)
-                .discipline(ResearchDisciplines.RUNEWORKING).tier(ResearchTiers.SUPREME).icon(ItemsPMX.GATE_RUNE.get())
+                .discipline(ResearchDisciplines.RUNEWORKING).tier(ResearchTier.SUPREME).icon(ItemsPMX.GATE_RUNE.get())
                 .parent(ResearchEntries.MASTER_RUNEWORKING).parent(STRONG_ENHANCER_RUNE).parent(ResearchEntries.WAND_GEM_WIZARD)
                 .parent(ResearchEntries.DISCOVER_VOID).parent(ResearchEntries.DISCOVER_INFERNAL)
                 .flags(ResearchEntry.Flags.builder().finaleExempt())
@@ -117,7 +124,7 @@ public class ResearchEntriesPMX {
                 .stage().attunement(Sources.VOID, 2).recipe(ItemsPMX.GATE_RUNE.get()).end()
                 .build());
         register(context, HASTE_RUNE, key -> new ResearchEntry.Builder(ConstantsPMX.MOD_ID, key)
-                .discipline(ResearchDisciplines.RUNEWORKING).tier(ResearchTiers.SUPREME).icon(ItemsPMX.HASTE_RUNE.get())
+                .discipline(ResearchDisciplines.RUNEWORKING).tier(ResearchTier.SUPREME).icon(ItemsPMX.HASTE_RUNE.get())
                 .parent(ResearchEntries.SUPREME_RUNEWORKING).parent(INFINITY_RUNE).parent(ResearchEntries.WAND_GEM_WIZARD)
                 .parent(ResearchEntries.DISCOVER_VOID)
                 .flags(ResearchEntry.Flags.builder().finaleExempt())

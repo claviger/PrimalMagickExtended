@@ -10,8 +10,15 @@ neoForge {
     if (at.exists()) {
         accessTransformers.from(at.absolutePath)
     }
+    parchment {
+        minecraftVersion = parchment_minecraft
+        mappingsVersion = parchment_version
+    }
     runs {
         configureEach {
+            // Only game tests whose structure template is in this mod's namespace are registered. This keeps
+            // Primal Magick's own tests, which are on the dev classpath inside its jar, out of this mod's runs.
+            systemProperty('neoforge.enabledGameTestNamespaces', mod_id)
             ideName = "NeoForge ${it.name.capitalize()} (${project.path})"
         }
         client {
@@ -20,7 +27,8 @@ neoForge {
             programArguments.addAll '--quickPlaySingleplayer', 'PMX Debug'
         }
         data {
-            clientData()
+            // 1.21.1 has a single data run (clientData() and serverData() only exist from 1.21.4)
+            data()
             gameDirectory = this.mkdir(this.file("runs/data"))
             // DataGen can be run by - "./gradlew :neoforge:runData" in Terminal.
             programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', rootProject.file('common/src/main/resources/').getAbsolutePath()
@@ -32,8 +40,6 @@ neoForge {
         }
         gameTestServer {
             type = "gameTestServer"
-            // NeoForge 26.1 ignores neoforge.enabledGameTestNamespaces; vanilla's --tests selector filters instead
-            programArguments.addAll '--tests', "${mod_id}:*"
         }
     }
     mods {
@@ -42,10 +48,6 @@ neoForge {
         }
     }
 }
-
-// Primal Magick NeoForge jar, built in the PM checkout; exactly one must be present
-def pmNeoforgeLibsDir = "${primalmagick_dir}/neoforge/build/libs"
-def pmNeoforgeJars = fileTree(dir: pmNeoforgeLibsDir, include: 'primalmagick-neoforge-*.jar', exclude: ['*-sources.jar', '*-javadoc.jar'])
 
 dependencies {
     // compile against the JEI API but do not include it at runtime
@@ -56,28 +58,13 @@ dependencies {
     // Common Networking (required by Primal Magick at runtime)
     implementation "mysticdrew:common-networking-neoforge:${common_network_version}-${common_network_mc_version}"
 
-    // Primal Magick itself (self-contained NeoForge jar built in the PM checkout); loaded as a mod in dev runs
-    implementation pmNeoforgeJars
-}
-
-// Fail clearly, rather than with missing classes or a duplicate mod, unless exactly one PM jar matched.
-// Only local values are captured so that the check works under the configuration cache.
-tasks.named('compileJava') {
-    def jars = pmNeoforgeJars
-    def libsDir = pmNeoforgeLibsDir
-    def pmDir = primalmagick_dir
-    doFirst {
-        def found = jars.files
-        if (found.isEmpty()) {
-            throw new GradleException("No Primal Magick neoforge jar found in ${libsDir}. Build Primal Magick first: cd ${pmDir} && ./gradlew clean :common:jar :neoforge:jar --no-configuration-cache")
-        }
-        if (found.size() > 1) {
-            throw new GradleException("Found ${found.size()} Primal Magick neoforge jars in ${libsDir}: ${found*.name.sort().join(', ')}. Run `cd ${pmDir} && ./gradlew clean :common:jar :neoforge:jar --no-configuration-cache` so exactly one jar remains.")
-        }
-    }
+    // Primal Magick itself: the official NeoForge release jar from Modrinth; loaded as a mod in dev runs
+    implementation "maven.modrinth:primal-magick:${primalmagick_modrinth_version}"
 }
 
 sourceSets.main.resources { srcDir 'src/generated/resources' }
+// The datagen hash cache lives beside the generated resources; keep it out of the jar
+tasks.named('processResources', ProcessResources) { exclude '.cache/**' }
 
 // Implement mcgradleconventions loader attribute
 def loaderAttribute = Attribute.of('io.github.mcgradleconventions.loader', String)

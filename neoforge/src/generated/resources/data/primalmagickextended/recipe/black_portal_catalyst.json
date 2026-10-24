@@ -5,14 +5,21 @@
       "feature": "portals"
     }
   ],
-  "type": "primalmagick:shaped_arcane",
-  "category": "arcane",
+  "type": "primalmagick:arcane_crafting_shaped",
   "expertiseGroup": "primalmagickextended:portal_catalysts",
   "key": {
-    "#": "primalmagick:essence_shard_infernal",
-    "B": "minecraft:black_dye",
-    "E": "minecraft:ender_eye",
-    "P": "minecraft:ender_pearl"
+    "#": {
+      "item": "primalmagick:essence_shard_infernal"
+    },
+    "B": {
+      "item": "minecraft:black_dye"
+    },
+    "E": {
+      "item": "minecraft:ender_eye"
+    },
+    "P": {
+      "item": "minecraft:ender_pearl"
+    }
   },
   "mana": {
     "sources": {

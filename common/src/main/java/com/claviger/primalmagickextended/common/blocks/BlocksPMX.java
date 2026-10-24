@@ -25,8 +25,7 @@ import java.util.function.ToIntFunction;
 
 /**
  * Deferred registry for the mod's blocks: one portal block per {@link PortalColor} and the five portal rune blocks.
- * Block properties are built inside each supplier, so that they receive their registry key from the registry
- * service. The property values are Custom Portals'.
+ * The property values are Custom Portals'.
  */
 public class BlocksPMX {
     public static void init() {
@@ -40,12 +39,12 @@ public class BlocksPMX {
     /** Fresh instance per block: block properties must not be shared. */
     private static BlockBehaviour.Properties runeProperties() {
         return BlockBehaviour.Properties.of().sound(SoundType.AMETHYST_CLUSTER)
-                .noOcclusion().lightLevel(RUNE_LUMINANCE).noCollision().strength(0.3F);
+                .noOcclusion().lightLevel(RUNE_LUMINANCE).noCollission().strength(0.3F);
     }
 
     private static BlockBehaviour.Properties portalProperties(MapColor color, boolean emitsLight) {
         BlockBehaviour.Properties properties = BlockBehaviour.Properties.of().mapColor(color)
-                .noOcclusion().noCollision().randomTicks().strength(-1.0F).sound(SoundType.GLASS);
+                .noOcclusion().noCollission().randomTicks().strength(-1.0F).sound(SoundType.GLASS);
         return emitsLight ? properties.lightLevel(STATE_TO_LUMINANCE) : properties;
     }
 

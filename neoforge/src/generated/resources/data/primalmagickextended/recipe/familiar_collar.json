@@ -7,12 +7,24 @@
   ],
   "type": "primalmagick:ritual",
   "ingredients": [
-    "primalmagick:rune_summon",
-    "primalmagick:rune_creature",
-    "primalmagick:rune_infernal",
-    "minecraft:bone",
-    "minecraft:feather",
-    "#c:foods/raw_fish"
+    {
+      "item": "primalmagick:rune_summon"
+    },
+    {
+      "item": "primalmagick:rune_creature"
+    },
+    {
+      "item": "primalmagick:rune_infernal"
+    },
+    {
+      "item": "minecraft:bone"
+    },
+    {
+      "item": "minecraft:feather"
+    },
+    {
+      "tag": "c:foods/raw_fish"
+    }
   ],
   "instability": 3,
   "mana": {
@@ -22,8 +34,12 @@
     }
   },
   "props": [
-    "primalmagick:ritual_bell",
-    "primalmagick:incense_brazier"
+    {
+      "block": "primalmagick:ritual_bell"
+    },
+    {
+      "block": "primalmagick:incense_brazier"
+    }
   ],
   "requirement": {
     "requirement_type": "primalmagick:research",
@@ -33,6 +49,7 @@
     }
   },
   "result": {
+    "count": 1,
     "id": "primalmagickextended:familiar_collar"
   }
 }

@@ -3,7 +3,7 @@ package com.claviger.primalmagickextended.test.portals;
 import com.claviger.primalmagickextended.common.network.packets.portals.SyncPortalsPacket;
 import com.claviger.primalmagickextended.common.portals.CustomPortal;
 import com.claviger.primalmagickextended.common.portals.PortalColor;
-import com.verdantartifice.primalmagick.test.AbstractBaseTest;
+import com.claviger.primalmagickextended.test.AbstractBaseTestPMX;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.DecoderException;
 import net.minecraft.core.BlockPos;
@@ -12,7 +12,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +22,7 @@ import java.util.function.Consumer;
 /**
  * Tests that a {@link CustomPortal} survives its persistence codec and its network stream codec unchanged.
  */
-public class PortalCodecTests extends AbstractBaseTest {
+public class PortalCodecTests extends AbstractBaseTestPMX {
     /** The persisted field names, which saved worlds depend on. */
     private static final Set<String> PERSISTED_KEYS = Set.of("frameId", "dimensionId", "color", "spawnPos", "portalBlocks",
             "offsetX", "offsetZ", "creatorId", "hasteRunes", "gateRunes", "weakEnhancerRunes", "strongEnhancerRunes",
@@ -57,7 +56,7 @@ public class PortalCodecTests extends AbstractBaseTest {
         CustomPortal original = sample();
         Tag tag = CustomPortal.CODEC.encodeStart(NbtOps.INSTANCE, original).getOrThrow();
         CompoundTag compound = assertInstanceOf(helper, tag, CompoundTag.class, "Encoded portal is not a compound tag");
-        assertValueEqual(helper, PERSISTED_KEYS, compound.keySet(), "persisted keys");
+        assertValueEqual(helper, PERSISTED_KEYS, compound.getAllKeys(), "persisted keys");
         CustomPortal decoded = CustomPortal.CODEC.parse(NbtOps.INSTANCE, tag).getOrThrow();
         assertSame(helper, original, decoded);
         helper.succeed();
@@ -94,7 +93,7 @@ public class PortalCodecTests extends AbstractBaseTest {
             assertDecodeFails(helper, "portals " + count, buf -> {
                 buf.writeVarInt(count);
                 buf.writeLong(0L);
-            }, buf -> SyncPortalsPacket.STREAM_CODEC.decode(new RegistryFriendlyByteBuf(buf, helper.getLevel().registryAccess())));
+            }, buf -> SyncPortalsPacket.STREAM_CODEC.decode(registryBuffer(buf, helper.getLevel().registryAccess())));
         }
         helper.succeed();
     }

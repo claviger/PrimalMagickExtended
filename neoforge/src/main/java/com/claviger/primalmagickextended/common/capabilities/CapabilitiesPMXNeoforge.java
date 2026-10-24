@@ -20,19 +20,17 @@ public class CapabilitiesPMXNeoforge {
     }
 
     /**
-     * Per-player familiar data; copied on death. Delta updates are sent to the owning player only;
-     * NeoForge's initial pairing sync also sends the two booleans to players that start tracking the
-     * owner (engine limitation), so client code must only read the local player's data.
+     * Per-player familiar data; copied on death. Attachments cannot sync themselves on this version, so the
+     * client's view is sent to the owning player only, by {@code CapabilityServicePMXNeoforge.syncFamiliar}.
      */
     public static final Supplier<AttachmentType<PlayerFamiliarNeoforge>> FAMILIAR = ATTACHMENTS.register("familiar",
             () -> AttachmentType.serializable(PlayerFamiliarNeoforge::new)
                     .copyOnDeath()
-                    .sync((holder, player) -> holder == player, PlayerFamiliarNeoforge.SYNC_STREAM_CODEC)
                     .build());
 
     /** Per-entity familiar marker; persisted only when present. */
     public static final Supplier<AttachmentType<FamiliarBinding>> FAMILIAR_BINDING = ATTACHMENTS.register("familiar_binding",
             () -> AttachmentType.builder(() -> FamiliarBinding.NONE)
-                    .serialize(FamiliarBinding.MAP_CODEC, FamiliarBinding::isPresent)
+                    .serialize(FamiliarBinding.MAP_CODEC.codec(), FamiliarBinding::isPresent)
                     .build());
 }

@@ -72,7 +72,7 @@ public class FindFamiliarSpellPayload extends AbstractSpellPayload<FindFamiliarS
         return new ResearchRequirement(new ResearchEntryKey(entry)) {
             @Override
             public boolean isMetBy(Player player) {
-                return super.isMetBy(player) && player.registryAccess().lookupOrThrow(RegistryKeysPM.RESEARCH_ENTRIES).containsKey(entry);
+                return super.isMetBy(player) && player.registryAccess().registryOrThrow(RegistryKeysPM.RESEARCH_ENTRIES).containsKey(entry);
             }
         };
     }

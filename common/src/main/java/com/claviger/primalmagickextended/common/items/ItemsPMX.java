@@ -33,9 +33,11 @@ public class ItemsPMX {
         ServicesPMX.ITEMS_REGISTRY.init();
     }
 
+    // Familiars
     public static final IRegistryItem<Item, FamiliarCollarItem> FAMILIAR_COLLAR = registerSupplier("familiar_collar",
             () -> new FamiliarCollarItem(new Item.Properties().stacksTo(16).rarity(Rarity.UNCOMMON)));
 
+    // Portals
     // Portal catalysts, registered in Custom Portals' creative tab order
     private static final Map<PortalColor, IRegistryItem<Item, PortalCatalystItem>> CATALYSTS = registerCatalysts();
 

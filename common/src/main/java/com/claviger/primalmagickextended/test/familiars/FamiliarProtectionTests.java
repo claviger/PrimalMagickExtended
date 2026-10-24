@@ -6,15 +6,14 @@ import com.claviger.primalmagickextended.common.familiars.FamiliarBinding;
 import com.claviger.primalmagickextended.common.familiars.FamiliarManager;
 import com.claviger.primalmagickextended.common.familiars.StoredFamiliar;
 import com.claviger.primalmagickextended.platform.ServicesPMX;
-import com.verdantartifice.primalmagick.test.AbstractBaseTest;
-import com.verdantartifice.primalmagick.test.util.RecordingServerPlayer;
+import com.claviger.primalmagickextended.test.AbstractBaseTestPMX;
+import com.claviger.primalmagickextended.test.util.RecordingServerPlayerPMX;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.animal.wolf.Wolf;
+import net.minecraft.world.entity.animal.Wolf;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.phys.Vec3;
@@ -26,9 +25,9 @@ import java.util.UUID;
  * Tests that familiars can never be hurt or lost: damage dismisses them, stale copies are removed,
  * chunk unloads refresh the owner's snapshot, and logout stores them with the player.
  */
-public class FamiliarProtectionTests extends AbstractBaseTest {
-    private static final Vec3 PLAYER_POS = new Vec3(2.5D, 1.0D, 2.5D);
-    private static final Vec3 PET_POS = new Vec3(1.5D, 1.0D, 1.5D);
+public class FamiliarProtectionTests extends AbstractBaseTestPMX {
+    private static final Vec3 PLAYER_POS = new Vec3(2.5D, 2.0D, 2.5D);
+    private static final Vec3 PET_POS = new Vec3(1.5D, 2.0D, 1.5D);
 
     private static ServerPlayer player(GameTestHelper helper) {
         ServerPlayer player = FamiliarTestUtils.placePlayer(helper, makeMockServerPlayer(helper, true), PLAYER_POS);
@@ -44,11 +43,11 @@ public class FamiliarProtectionTests extends AbstractBaseTest {
         ServerPlayer player = player(helper);
         Wolf wolf = FamiliarTestUtils.bindWolf(helper, player, PET_POS);
         float healthBefore = wolf.getHealth();
-        boolean hurt = wolf.hurtServer(helper.getLevel(), helper.getLevel().damageSources().generic(), 4.0F);
+        boolean hurt = wolf.hurt(helper.getLevel().damageSources().generic(), 4.0F);
         assertFalse(helper, hurt, "Damage was applied");
         assertTrue(helper, wolf.isRemoved(), "Familiar still present after damage");
         assertTrue(helper, stored(player).activeEntityId().isEmpty(), "Familiar still marked active");
-        assertValueEqual(helper, healthBefore, stored(player).entityData().getFloatOr("Health", 0.0F), "Snapshot health changed");
+        assertValueEqual(helper, healthBefore, stored(player).entityData().getFloat("Health"), "Snapshot health changed");
         helper.succeedWhen(() -> {
             helper.assertEntityNotPresent(EntityType.WOLF);
             helper.assertEntityNotPresent(EntityType.ITEM);
@@ -58,7 +57,7 @@ public class FamiliarProtectionTests extends AbstractBaseTest {
     public static void familiar_dismisses_on_generic_kill(GameTestHelper helper) {
         ServerPlayer player = player(helper);
         Wolf wolf = FamiliarTestUtils.bindWolf(helper, player, PET_POS);
-        wolf.kill(helper.getLevel());
+        wolf.kill();
         assertTrue(helper, wolf.isRemoved(), "Familiar still present after kill");
         assertFalse(helper, wolf.isDeadOrDying(), "Familiar died");
         assertTrue(helper, stored(player).activeEntityId().isEmpty(), "Familiar still marked active");
@@ -79,12 +78,12 @@ public class FamiliarProtectionTests extends AbstractBaseTest {
         ServerPlayer player = player(helper);
         Wolf oldWolf = FamiliarTestUtils.bindWolf(helper, player, PET_POS);
         oldWolf.setCustomName(Component.literal("Old"));
-        Wolf newWolf = FamiliarTestUtils.tamedWolf(helper, player, new Vec3(3.5D, 1.0D, 1.5D));
+        Wolf newWolf = FamiliarTestUtils.tamedWolf(helper, player, new Vec3(3.5D, 2.0D, 1.5D));
         assertTrue(helper, FamiliarManager.bind(player, newWolf, FamiliarTestUtils.collar()), "Second bind failed");
 
         assertFalse(helper, oldWolf.isRemoved(), "Old familiar was removed");
         assertTrue(helper, ServicesPMX.CAPABILITIES.binding(oldWolf).isEmpty(), "Old familiar still bound");
-        assertTrue(helper, oldWolf.isTame() && oldWolf.getOwnerReference().getUUID().equals(player.getUUID()), "Old familiar lost its owner");
+        assertTrue(helper, oldWolf.isTame() && player.getUUID().equals(oldWolf.getOwnerUUID()), "Old familiar lost its owner");
         assertValueEqual(helper, "Old", oldWolf.getCustomName().getString(), "Old familiar lost its name");
         assertTrue(helper, ServicesPMX.CAPABILITIES.binding(newWolf).isPresent(), "New familiar not bound");
         assertValueEqual(helper, Optional.of(newWolf.getUUID()), stored(player).activeEntityId(), "Stored active id is not the new familiar");
@@ -96,7 +95,7 @@ public class FamiliarProtectionTests extends AbstractBaseTest {
         Wolf oldWolf = FamiliarTestUtils.bindWolf(helper, player, PET_POS);
         oldWolf.setCustomName(Component.literal("Old"));
         FamiliarManager.dismiss(player, oldWolf);
-        Wolf newWolf = FamiliarTestUtils.tamedWolf(helper, player, new Vec3(3.5D, 1.0D, 1.5D));
+        Wolf newWolf = FamiliarTestUtils.tamedWolf(helper, player, new Vec3(3.5D, 2.0D, 1.5D));
         assertTrue(helper, FamiliarManager.bind(player, newWolf, FamiliarTestUtils.collar()), "Second bind failed");
         helper.succeedWhen(() -> {
             var wolves = helper.getEntities(EntityType.WOLF);
@@ -109,7 +108,7 @@ public class FamiliarProtectionTests extends AbstractBaseTest {
     }
 
     public static void release_with_unrestorable_snapshot_clears_familiar_and_allows_bind(GameTestHelper helper) {
-        RecordingServerPlayer player = RecordingServerPlayer.create(helper, true);
+        RecordingServerPlayerPMX player = RecordingServerPlayerPMX.create(helper, true);
         FamiliarTestUtils.placePlayer(helper, player, PLAYER_POS);
         player.setGameMode(GameType.SURVIVAL);
         Wolf oldWolf = FamiliarTestUtils.bindWolf(helper, player, PET_POS);
@@ -119,7 +118,7 @@ public class FamiliarProtectionTests extends AbstractBaseTest {
         StoredFamiliar broken = stored(player);
         familiar.setStored(Optional.of(new StoredFamiliar(EntityType.ITEM, broken.entityData(), broken.generation(), Optional.empty())));
 
-        Wolf newWolf = FamiliarTestUtils.tamedWolf(helper, player, new Vec3(3.5D, 1.0D, 1.5D));
+        Wolf newWolf = FamiliarTestUtils.tamedWolf(helper, player, new Vec3(3.5D, 2.0D, 1.5D));
         assertTrue(helper, FamiliarManager.bind(player, newWolf, FamiliarTestUtils.collar()), "Bind after an unrestorable familiar failed");
         assertTrue(helper, ServicesPMX.CAPABILITIES.binding(newWolf).filter(b -> b.isOwnedBy(player.getUUID())).isPresent(), "New wolf is not bound to the player");
         StoredFamiliar stored = stored(player);
@@ -134,14 +133,14 @@ public class FamiliarProtectionTests extends AbstractBaseTest {
     }
 
     public static void release_with_refused_join_aborts_bind_and_keeps_familiar(GameTestHelper helper) {
-        RecordingServerPlayer player = RecordingServerPlayer.create(helper, true);
+        RecordingServerPlayerPMX player = RecordingServerPlayerPMX.create(helper, true);
         FamiliarTestUtils.placePlayer(helper, player, PLAYER_POS);
         player.setGameMode(GameType.SURVIVAL);
         Wolf oldWolf = FamiliarTestUtils.bindWolf(helper, player, PET_POS);
         FamiliarManager.dismiss(player, oldWolf);
         StoredFamiliar before = stored(player);
 
-        Wolf newWolf = FamiliarTestUtils.tamedWolf(helper, player, new Vec3(3.5D, 1.0D, 1.5D));
+        Wolf newWolf = FamiliarTestUtils.tamedWolf(helper, player, new Vec3(3.5D, 2.0D, 1.5D));
         ItemStack collar = FamiliarTestUtils.collar();
         boolean bound;
         // Make the level refuse the released pet, as a join vetoed by another mod would
@@ -167,7 +166,7 @@ public class FamiliarProtectionTests extends AbstractBaseTest {
         ServerPlayer player = player(helper);
         Wolf wolf = FamiliarTestUtils.bindWolf(helper, player, PET_POS);
         StoredFamiliar before = stored(player);
-        Wolf stale = FamiliarTestUtils.tamedWolf(helper, player, new Vec3(3.5D, 1.0D, 3.5D));
+        Wolf stale = FamiliarTestUtils.tamedWolf(helper, player, new Vec3(3.5D, 2.0D, 3.5D));
         ServicesPMX.CAPABILITIES.setBinding(stale, new FamiliarBinding(player.getUUID(), UUID.randomUUID()));
         assertTrue(helper, FamiliarEvents.onEntityJoin(stale, helper.getLevel()), "Stale copy was not discarded");
         assertTrue(helper, stale.isRemoved(), "Stale copy still present");
@@ -181,7 +180,7 @@ public class FamiliarProtectionTests extends AbstractBaseTest {
         Wolf wolf = FamiliarTestUtils.bindWolf(helper, player, PET_POS);
         UUID generation = stored(player).generation();
         wolf.discard();
-        Wolf replacement = FamiliarTestUtils.tamedWolf(helper, player, new Vec3(3.5D, 1.0D, 3.5D));
+        Wolf replacement = FamiliarTestUtils.tamedWolf(helper, player, new Vec3(3.5D, 2.0D, 3.5D));
         ServicesPMX.CAPABILITIES.setBinding(replacement, new FamiliarBinding(player.getUUID(), generation));
         assertFalse(helper, FamiliarEvents.onEntityJoin(replacement, helper.getLevel()), "Current-generation copy was discarded");
         assertValueEqual(helper, Optional.of(replacement.getUUID()), stored(player).activeEntityId(), "Replacement was not adopted");
@@ -193,7 +192,7 @@ public class FamiliarProtectionTests extends AbstractBaseTest {
         FamiliarTestUtils.bindWolf(helper, player, PET_POS);
         UUID generation = stored(player).generation();
         UUID activeBefore = stored(player).activeEntityId().orElseThrow();
-        Wolf duplicate = FamiliarTestUtils.tamedWolf(helper, player, new Vec3(3.5D, 1.0D, 3.5D));
+        Wolf duplicate = FamiliarTestUtils.tamedWolf(helper, player, new Vec3(3.5D, 2.0D, 3.5D));
         ServicesPMX.CAPABILITIES.setBinding(duplicate, new FamiliarBinding(player.getUUID(), generation));
         assertTrue(helper, FamiliarEvents.onEntityJoin(duplicate, helper.getLevel()), "Duplicate was not discarded");
         assertValueEqual(helper, Optional.of(activeBefore), stored(player).activeEntityId(), "Active id changed");
@@ -228,7 +227,7 @@ public class FamiliarProtectionTests extends AbstractBaseTest {
         StoredFamiliar after = stored(player);
         assertTrue(helper, after.activeEntityId().isEmpty(), "Familiar still marked active after unload");
         assertFalse(helper, generationBefore.equals(after.generation()), "Generation was not rotated on unload");
-        assertTrue(helper, after.entityData().getString("CustomName").map(s -> s.contains("Unloaded")).orElse(false), "Snapshot not refreshed on unload");
+        assertTrue(helper, after.entityData().getString("CustomName").contains("Unloaded"), "Snapshot not refreshed on unload");
         helper.succeed();
     }
 
@@ -243,7 +242,7 @@ public class FamiliarProtectionTests extends AbstractBaseTest {
         assertFalse(helper, wolf.isRemoved(), "Leave-level handler removed the familiar");
         assertTrue(helper, after.activeEntityId().isEmpty(), "Familiar still marked active after leaving");
         assertFalse(helper, generationBefore.equals(after.generation()), "Generation was not rotated on leaving");
-        assertTrue(helper, after.entityData().getString("CustomName").map(s -> s.contains("Hidden")).orElse(false), "Snapshot not refreshed on leaving");
+        assertTrue(helper, after.entityData().getString("CustomName").contains("Hidden"), "Snapshot not refreshed on leaving");
         assertTrue(helper, FamiliarEvents.onEntityJoin(wolf, helper.getLevel()), "Copy with the old generation was not stale");
         helper.succeed();
     }
@@ -263,13 +262,13 @@ public class FamiliarProtectionTests extends AbstractBaseTest {
     public static void stale_generation_familiar_is_rejected_by_real_join_event(GameTestHelper helper) {
         ServerPlayer player = player(helper);
         FamiliarTestUtils.bindWolf(helper, player, PET_POS);
-        Wolf stale = EntityType.WOLF.create(helper.getLevel(), EntitySpawnReason.MOB_SUMMONED);
+        Wolf stale = EntityType.WOLF.create(helper.getLevel());
         if (stale == null) {
             helper.fail("Could not create the stale wolf");
             return;
         }
-        Vec3 pos = helper.absoluteVec(new Vec3(3.5D, 1.0D, 3.5D));
-        stale.absSnapTo(pos.x, pos.y, pos.z, 0.0F, 0.0F);
+        Vec3 pos = helper.absoluteVec(new Vec3(3.5D, 2.0D, 3.5D));
+        stale.absMoveTo(pos.x, pos.y, pos.z, 0.0F, 0.0F);
         ServicesPMX.CAPABILITIES.setBinding(stale, new FamiliarBinding(player.getUUID(), UUID.randomUUID()));
         assertFalse(helper, helper.getLevel().addFreshEntity(stale), "Level accepted the stale copy");
         assertValueEqual(helper, 1, helper.getEntities(EntityType.WOLF).size(), "Wolves in the world");
@@ -296,7 +295,7 @@ public class FamiliarProtectionTests extends AbstractBaseTest {
     public static void zero_damage_hit_does_not_dismiss(GameTestHelper helper) {
         ServerPlayer player = player(helper);
         Wolf wolf = FamiliarTestUtils.bindWolf(helper, player, PET_POS);
-        boolean hurt = wolf.hurtServer(helper.getLevel(), helper.getLevel().damageSources().generic(), 0.0F);
+        boolean hurt = wolf.hurt(helper.getLevel().damageSources().generic(), 0.0F);
         assertFalse(helper, hurt, "Harmless hit was applied");
         assertFalse(helper, wolf.isRemoved(), "Harmless hit dismissed the familiar");
         assertValueEqual(helper, Optional.of(wolf.getUUID()), stored(player).activeEntityId(), "Familiar no longer active");
@@ -304,11 +303,11 @@ public class FamiliarProtectionTests extends AbstractBaseTest {
     }
 
     public static void stale_familiar_in_boat_is_swept(GameTestHelper helper) {
-        Entity boat = helper.spawn(EntityType.OAK_BOAT, PET_POS);
+        Entity boat = helper.spawn(EntityType.BOAT, PET_POS);
         Wolf wolf = helper.spawnWithNoFreeWill(EntityType.WOLF, PET_POS);
         // Bound after joining, so only the periodic check can catch it; passengers get no tick event of their own
         ServicesPMX.CAPABILITIES.setBinding(wolf, new FamiliarBinding(UUID.randomUUID(), UUID.randomUUID()));
-        assertTrue(helper, wolf.startRiding(boat, true, false), "Wolf could not board the boat");
+        assertTrue(helper, wolf.startRiding(boat, true), "Wolf could not board the boat");
         helper.succeedWhen(() -> {
             assertTrue(helper, wolf.isRemoved(), "Stale familiar in a boat still present");
             boat.discard();

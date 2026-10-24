@@ -1,8 +1,9 @@
-name: Build and Run Tests
+name: Build and Run Tests (1.21.1)
 on:
   push:
-    branches: [main]
+    branches: ['mc/1.21.1']
   pull_request:
+    branches: ['mc/1.21.1']
 jobs:
   gradle:
     runs-on: "ubuntu-latest"
@@ -10,25 +11,13 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        path: Primal-Magick-Extended
-        fetch-depth: 0
-    - uses: actions/checkout@v4
-      with:
-        repository: claviger/PrimalMagick
-        ref: port26integration
-        path: PrimalMagick
-        fetch-depth: 0
+        fetch-depth: 0          # the mod version comes from the git tags
     - uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: 21
     - uses: gradle/actions/setup-gradle@v4
-    - name: Build Primal Magick jars
-      working-directory: ./PrimalMagick
-      run: ./gradlew clean :common:jar :neoforge:jar --no-configuration-cache
     - name: Build mod JARs
-      working-directory: ./Primal-Magick-Extended
-      run: ./gradlew build -Pprimalmagick_dir=${{ github.workspace }}/PrimalMagick
+      run: ./gradlew :neoforge:build
     - name: Run NeoForge tests
-      working-directory: ./Primal-Magick-Extended
-      run: ./gradlew :neoforge:runGameTestServer -Pprimalmagick_dir=${{ github.workspace }}/PrimalMagick
+      run: ./gradlew :neoforge:runGameTestServer

@@ -10,8 +10,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import java.util.function.Supplier;
 
 /**
- * NeoForge implementation of the item registry service. Items are constructed inside Primal Magick's
- * RegistryIdContext (see the base class), so their properties receive their registry key automatically.
+ * NeoForge implementation of the item registry service.
  */
 public class ItemRegistryServicePMXNeoforge extends AbstractRegistryServicePMXNeoforge<Item> implements IItemRegistryServicePMX {
     private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, ConstantsPMX.MOD_ID);

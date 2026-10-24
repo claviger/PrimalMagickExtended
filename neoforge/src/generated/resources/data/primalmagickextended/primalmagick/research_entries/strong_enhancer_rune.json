@@ -66,6 +66,11 @@
       "textTranslationKey": "research.primalmagickextended.strong_enhancer_rune.text.stage.1"
     },
     {
+      "attunements": {
+        "sources": {
+          "primalmagick:infernal": 2
+        }
+      },
       "parentKey": {
         "rootKey": "primalmagickextended:strong_enhancer_rune"
       },
@@ -73,16 +78,9 @@
         "primalmagickextended:strong_enhancer_rune"
       ],
       "revelations": [],
-      "rewards": [
-        {
-          "amount": 2,
-          "reward_type": "primalmagick:attunement",
-          "source": "primalmagick:infernal"
-        }
-      ],
       "siblings": [],
       "textTranslationKey": "research.primalmagickextended.strong_enhancer_rune.text.stage.2"
     }
   ],
-  "tier": "primalmagick:master"
+  "tier": "master"
 }

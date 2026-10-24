@@ -6,13 +6,15 @@ import com.claviger.primalmagickextended.common.items.ItemsPMX;
 import com.claviger.primalmagickextended.common.portals.CustomPortal;
 import com.claviger.primalmagickextended.common.portals.PortalColor;
 import com.claviger.primalmagickextended.common.portals.PortalData;
-import com.verdantartifice.primalmagick.test.AbstractBaseTest;
+import com.claviger.primalmagickextended.test.AbstractBaseTestPMX;
+import com.claviger.primalmagickextended.test.TestUtilsPMX;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
@@ -31,13 +33,13 @@ import java.util.List;
  * frame, attaching runes and setting the arrival point. The portal registry is shared by every test in a run, so
  * each test uses its own frame block, and portals from different tests never link.
  */
-public class PortalWorldTests extends AbstractBaseTest {
+public class PortalWorldTests extends AbstractBaseTestPMX {
     private static final String OVERWORLD = "minecraft:overworld";
-    /** Origin of a single frame, centred in the 7x7 floor. */
-    private static final BlockPos SINGLE_ORIGIN = new BlockPos(1, 1, 3);
+    /** Origin of a single frame, centred in the 7x7 floor, one block above the floor. */
+    private static final BlockPos SINGLE_ORIGIN = TestUtilsPMX.TEMPLATE_ORIGIN.offset(1, 1, 3);
     /** Origins of two frames 4 blocks apart in Z. */
-    private static final BlockPos FIRST_ORIGIN = new BlockPos(1, 1, 1);
-    private static final BlockPos SECOND_ORIGIN = new BlockPos(1, 1, 5);
+    private static final BlockPos FIRST_ORIGIN = TestUtilsPMX.TEMPLATE_ORIGIN.offset(1, 1, 1);
+    private static final BlockPos SECOND_ORIGIN = TestUtilsPMX.TEMPLATE_ORIGIN.offset(1, 1, 5);
 
     private static void assertPortalBlocks(GameTestHelper helper, BlockPos interiorRel, PortalColor color, String label) {
         for (BlockPos pos : PortalTestUtils.interior(interiorRel)) {
@@ -74,7 +76,7 @@ public class PortalWorldTests extends AbstractBaseTest {
     private static CustomPortal buildAndLight(GameTestHelper helper, ServerPlayer player, Block frame, BlockPos origin, PortalColor color) {
         BlockPos interior = PortalTestUtils.buildFrame(helper, frame, origin);
         InteractionResult result = PortalTestUtils.lightPortal(helper, player, ItemsPMX.catalyst(color), interior);
-        assertValueEqual(helper, InteractionResult.SUCCESS, result, "catalyst result for the frame at " + origin);
+        assertValueEqual(helper, InteractionResult.CONSUME, result, "catalyst result for the frame at " + origin);
         return requirePortal(helper, interior, "frame at " + origin);
     }
 
@@ -85,7 +87,7 @@ public class PortalWorldTests extends AbstractBaseTest {
 
         InteractionResult result = PortalTestUtils.lightPortal(helper, player, catalyst, interior);
 
-        assertValueEqual(helper, InteractionResult.SUCCESS, result, "catalyst result");
+        assertValueEqual(helper, InteractionResult.CONSUME, result, "catalyst result");
         // The catalyst shrinks the stack by one on success, whatever the player's game mode
         assertValueEqual(helper, 2, player.getMainHandItem().getCount(), "catalysts left in hand");
         assertPortalBlocks(helper, interior, PortalColor.WHITE, "built portal");
@@ -241,9 +243,9 @@ public class PortalWorldTests extends AbstractBaseTest {
         player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
         player.setShiftKeyDown(true);
         BlockHitResult hit = new BlockHitResult(Vec3.atCenterOf(targetAbs), Direction.NORTH, targetAbs, false);
-        InteractionResult result = block.useItemOn(ItemStack.EMPTY, state, helper.getLevel(), targetAbs, player, InteractionHand.MAIN_HAND, hit);
+        ItemInteractionResult result = block.useItemOn(ItemStack.EMPTY, state, helper.getLevel(), targetAbs, player, InteractionHand.MAIN_HAND, hit);
 
-        assertValueEqual(helper, InteractionResult.SUCCESS, result, "sneak-use result");
+        assertValueEqual(helper, ItemInteractionResult.CONSUME, result, "sneak-use result");
         assertValueEqual(helper, targetAbs, portal.getSpawnPos(), "arrival point");
         assertValueEqual(helper, 0.5F, portal.getOffsetX(), "arrival X offset");
         assertValueEqual(helper, 0.5F, portal.getOffsetZ(), "arrival Z offset");

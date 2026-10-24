@@ -9,7 +9,8 @@ import com.claviger.primalmagickextended.common.portals.PortalColor;
 import com.claviger.primalmagickextended.common.portals.PortalData;
 import com.claviger.primalmagickextended.common.portals.PortalRegistry;
 import com.claviger.primalmagickextended.common.portals.PortalSavedData;
-import com.verdantartifice.primalmagick.test.AbstractBaseTest;
+import com.claviger.primalmagickextended.test.AbstractBaseTestPMX;
+import com.claviger.primalmagickextended.test.TestUtilsPMX;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -34,16 +35,16 @@ import java.util.List;
  * Regression tests for the defects fixed after the port. The portal registry is shared by every test in a run, so
  * each test uses its own frame block, and portals from different tests never link.
  */
-public class PortalFixTests extends AbstractBaseTest {
-    /** Origin of a single frame, centred in the 7x7 floor. */
-    private static final BlockPos SINGLE_ORIGIN = new BlockPos(1, 1, 3);
+public class PortalFixTests extends AbstractBaseTestPMX {
+    /** Origin of a single frame, centred in the 7x7 floor, one block above the floor. */
+    private static final BlockPos SINGLE_ORIGIN = TestUtilsPMX.TEMPLATE_ORIGIN.offset(1, 1, 3);
     /** The frame block below the interior's bottom-left block. */
     private static final BlockPos FRAME_REL = SINGLE_ORIGIN.offset(1, 0, 0);
     /** The space on the outward (north) face of that frame block, where the tests put their rune. */
     private static final BlockPos RUNE_REL = FRAME_REL.north();
     /** Origins of two frames 4 blocks apart in Z. */
-    private static final BlockPos FIRST_ORIGIN = new BlockPos(1, 1, 1);
-    private static final BlockPos SECOND_ORIGIN = new BlockPos(1, 1, 5);
+    private static final BlockPos FIRST_ORIGIN = TestUtilsPMX.TEMPLATE_ORIGIN.offset(1, 1, 1);
+    private static final BlockPos SECOND_ORIGIN = TestUtilsPMX.TEMPLATE_ORIGIN.offset(1, 1, 5);
 
     private static CustomPortal buildAndLight(GameTestHelper helper, ServerPlayer player, Block frame, PortalColor color) {
         return buildAndLight(helper, player, frame, SINGLE_ORIGIN, color);
@@ -52,7 +53,7 @@ public class PortalFixTests extends AbstractBaseTest {
     private static CustomPortal buildAndLight(GameTestHelper helper, ServerPlayer player, Block frame, BlockPos origin, PortalColor color) {
         BlockPos interior = PortalTestUtils.buildFrame(helper, frame, origin);
         InteractionResult result = PortalTestUtils.lightPortal(helper, player, ItemsPMX.catalyst(color), interior);
-        assertValueEqual(helper, InteractionResult.SUCCESS, result, "catalyst result");
+        assertValueEqual(helper, InteractionResult.CONSUME, result, "catalyst result");
         CustomPortal portal = PortalTestUtils.portalAt(helper, interior);
         assertTrue(helper, portal != null, "Expected a registered portal at " + interior);
         return portal;
