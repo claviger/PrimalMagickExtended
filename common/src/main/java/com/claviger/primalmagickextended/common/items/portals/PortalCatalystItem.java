@@ -1,0 +1,51 @@
+package com.claviger.primalmagickextended.common.items.portals;
+
+import com.claviger.primalmagickextended.common.portals.PortalHelper;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+
+import java.util.function.Supplier;
+
+/**
+ * Item that fills a closed frame with portal blocks of its colour when used on the frame. Using it on a block face
+ * starts the frame search from the block next to that face. On success one catalyst is consumed. Ported from
+ * Custom Portals.
+ */
+public class PortalCatalystItem extends Item {
+    private final Supplier<? extends Block> portalBlock;
+
+    public PortalCatalystItem(Item.Properties settings, Supplier<? extends Block> portalBlock) {
+        super(settings);
+        this.portalBlock = portalBlock;
+    }
+
+    @Override
+    public InteractionResult useOn(UseOnContext ctx) {
+        Player playerEntity = ctx.getPlayer();
+        if (playerEntity == null) return InteractionResult.PASS;
+        Level world = ctx.getLevel();
+        BlockPos pos = new BlockPos(ctx.getClickedPos());
+        Direction dir = ctx.getClickedFace();
+        pos = switch (dir) {
+            case NORTH -> pos.north();
+            case SOUTH -> pos.south();
+            case EAST -> pos.east();
+            case WEST -> pos.west();
+            case UP -> pos.above();
+            case DOWN -> pos.below();
+        };
+        if (PortalHelper.buildPortal(pos, portalBlock.get(), playerEntity.getUUID(), world)) {
+            playerEntity.playSound(SoundEvents.FLINTANDSTEEL_USE, 1.0F, 1.0F);
+            ctx.getItemInHand().shrink(1);
+            return InteractionResult.SUCCESS;
+        }
+        return InteractionResult.PASS;
+    }
+}

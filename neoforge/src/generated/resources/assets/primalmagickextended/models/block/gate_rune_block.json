@@ -1,0 +1,6 @@
+{
+  "parent": "primalmagickextended:block/template_portal_rune",
+  "textures": {
+    "texture": "primalmagickextended:block/gate_rune_block"
+  }
+}

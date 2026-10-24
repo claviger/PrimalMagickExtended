@@ -1,0 +1,87 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "primalmagickextended:feature_enabled",
+      "feature": "portals"
+    }
+  ],
+  "addenda": [],
+  "disciplineKey": {
+    "rootKey": "primalmagick:runeworking"
+  },
+  "finales": [],
+  "flags": {
+    "finaleExempt": true
+  },
+  "icon": {
+    "isItem": true,
+    "location": "primalmagickextended:weak_enhancer_rune"
+  },
+  "key": {
+    "rootKey": "primalmagickextended:weak_enhancer_rune"
+  },
+  "parents": [
+    {
+      "rootKey": "primalmagickextended:portal_travel"
+    },
+    {
+      "rootKey": "primalmagick:expert_runeworking"
+    },
+    {
+      "rootKey": "primalmagick:discover_infernal"
+    }
+  ],
+  "stages": [
+    {
+      "completionRequirementOpt": {
+        "requirement_type": "primalmagick:and",
+        "subRequirements": [
+          {
+            "amount": 2,
+            "knowledgeType": "theory",
+            "requirement_type": "primalmagick:knowledge"
+          },
+          {
+            "requirement_type": "primalmagick:item_stack",
+            "stack": {
+              "id": "minecraft:amethyst_shard"
+            }
+          },
+          {
+            "requirement_type": "primalmagick:item_stack",
+            "stack": {
+              "count": 4,
+              "id": "minecraft:lapis_lazuli"
+            }
+          }
+        ]
+      },
+      "parentKey": {
+        "rootKey": "primalmagickextended:weak_enhancer_rune"
+      },
+      "recipes": [],
+      "revelations": [],
+      "siblings": [],
+      "textTranslationKey": "research.primalmagickextended.weak_enhancer_rune.text.stage.1"
+    },
+    {
+      "parentKey": {
+        "rootKey": "primalmagickextended:weak_enhancer_rune"
+      },
+      "recipes": [
+        "primalmagickextended:weak_enhancer_rune"
+      ],
+      "revelations": [],
+      "rewards": [
+        {
+          "amount": 2,
+          "reward_type": "primalmagick:attunement",
+          "source": "primalmagick:infernal"
+        }
+      ],
+      "siblings": [],
+      "textTranslationKey": "research.primalmagickextended.weak_enhancer_rune.text.stage.2"
+    }
+  ],
+  "tier": "primalmagick:expert"
+}

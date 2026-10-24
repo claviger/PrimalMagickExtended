@@ -1,0 +1,89 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "primalmagickextended:feature_enabled",
+      "feature": "portals"
+    }
+  ],
+  "addenda": [],
+  "disciplineKey": {
+    "rootKey": "primalmagick:runeworking"
+  },
+  "finales": [],
+  "flags": {
+    "finaleExempt": true
+  },
+  "icon": {
+    "isItem": true,
+    "location": "primalmagickextended:infinity_rune"
+  },
+  "key": {
+    "rootKey": "primalmagickextended:infinity_rune"
+  },
+  "parents": [
+    {
+      "rootKey": "primalmagick:supreme_runeworking"
+    },
+    {
+      "rootKey": "primalmagickextended:strong_enhancer_rune"
+    },
+    {
+      "rootKey": "primalmagick:wand_gem_wizard"
+    },
+    {
+      "rootKey": "primalmagick:discover_void"
+    }
+  ],
+  "stages": [
+    {
+      "completionRequirementOpt": {
+        "requirement_type": "primalmagick:and",
+        "subRequirements": [
+          {
+            "amount": 2,
+            "knowledgeType": "theory",
+            "requirement_type": "primalmagick:knowledge"
+          },
+          {
+            "requirement_type": "primalmagick:item_stack",
+            "stack": {
+              "count": 6,
+              "id": "minecraft:chorus_fruit"
+            }
+          }
+        ]
+      },
+      "parentKey": {
+        "rootKey": "primalmagickextended:infinity_rune"
+      },
+      "recipes": [],
+      "revelations": [],
+      "siblings": [],
+      "textTranslationKey": "research.primalmagickextended.infinity_rune.text.stage.1"
+    },
+    {
+      "parentKey": {
+        "rootKey": "primalmagickextended:infinity_rune"
+      },
+      "recipes": [
+        "primalmagickextended:infinity_rune"
+      ],
+      "revelations": [],
+      "rewards": [
+        {
+          "amount": 2,
+          "reward_type": "primalmagick:attunement",
+          "source": "primalmagick:infernal"
+        },
+        {
+          "amount": 2,
+          "reward_type": "primalmagick:attunement",
+          "source": "primalmagick:void"
+        }
+      ],
+      "siblings": [],
+      "textTranslationKey": "research.primalmagickextended.infinity_rune.text.stage.2"
+    }
+  ],
+  "tier": "primalmagick:master"
+}

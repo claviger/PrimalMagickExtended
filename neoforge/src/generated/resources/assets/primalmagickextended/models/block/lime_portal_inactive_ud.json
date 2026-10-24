@@ -1,0 +1,6 @@
+{
+  "parent": "primalmagickextended:block/template_custom_portal_ud",
+  "textures": {
+    "portal": "primalmagickextended:block/lime_portal_inactive"
+  }
+}

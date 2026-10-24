@@ -1,0 +1,371 @@
+package com.claviger.primalmagickextended.common.portals;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.netty.buffer.ByteBuf;
+import io.netty.handler.codec.DecoderException;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import com.claviger.primalmagickextended.platform.ServicesPMX;
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+
+/**
+ * A built portal: its frame material, dimension, colour (stored as a {@link MapColor}), arrival point, the positions
+ * of its portal blocks, the player who built it and the rune counts on its frame, which are recounted from the world
+ * whenever a rune changes. Two portals link when {@link #tryLink(CustomPortal)} finds them compatible in colour,
+ * frame, range and dimension; the link and redstone state are runtime-only and are not persisted. Ported from Custom
+ * Portals.
+ */
+public class CustomPortal {
+
+    public float offsetX;
+    public float offsetZ;
+
+    private final String frameId;
+    private final String dimensionId;
+    private final MapColor color;
+
+    private BlockPos spawnPos;
+    private List<BlockPos> portalBlocks;
+    private int hasteRunes;
+    private int gateRunes;
+    private int weakEnhancerRunes;
+    private int strongEnhancerRunes;
+    private int infinityRunes;
+    private final UUID creatorId;
+
+    private boolean hasRedstoneSignal = false;
+    private boolean redstoneChecked = false;
+    
+    private CustomPortal linked;
+
+    public static final Codec<CustomPortal> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+        Codec.STRING.fieldOf("frameId").forGetter(CustomPortal::getFrameId),
+        Codec.STRING.fieldOf("dimensionId").forGetter(CustomPortal::getDimensionId),
+        Codec.INT.fieldOf("color").forGetter(CustomPortal::getColorId),
+        BlockPos.CODEC.fieldOf("spawnPos").forGetter(CustomPortal::getSpawnPos),
+        BlockPos.CODEC.listOf().fieldOf("portalBlocks").forGetter(CustomPortal::getPortalBlocks),
+        Codec.FLOAT.fieldOf("offsetX").forGetter(CustomPortal::getOffsetX),
+        Codec.FLOAT.fieldOf("offsetZ").forGetter(CustomPortal::getOffsetZ),
+        Codec.STRING.fieldOf("creatorId").forGetter(CustomPortal::getCreatorIdAsString),
+        Codec.INT.fieldOf("hasteRunes").forGetter(CustomPortal::getHasteRunes),
+        Codec.INT.fieldOf("gateRunes").forGetter(CustomPortal::getGateRunes),
+        Codec.INT.fieldOf("weakEnhancerRunes").forGetter(CustomPortal::getWeakEnhancerRunes),
+        Codec.INT.fieldOf("strongEnhancerRunes").forGetter(CustomPortal::getStrongEnhancerRunes),
+        Codec.INT.fieldOf("infinityRunes").forGetter(CustomPortal::getInfinityRunes)
+    ).apply(instance, CustomPortal::new));
+
+    /** Wire format for client sync. Packed BlockPos longs keep large portals small (1 MiB payload cap). */
+    public static final StreamCodec<ByteBuf, CustomPortal> STREAM_CODEC = StreamCodec.of(CustomPortal::encode, CustomPortal::decode);
+
+    /**
+     * The fewest bytes one portal can take in {@link #STREAM_CODEC}: three one-byte string lengths, a one-byte colour
+     * id, a packed spawn position, a one-byte block count, two floats and five one-byte rune counts.
+     */
+    public static final int MIN_STREAM_BYTES = 1 + 1 + 1 + Long.BYTES + 1 + 2 * Float.BYTES + 1 + 5;
+
+    /**
+     * Reads a collection size written as a VarInt, and rejects a negative size or one the remaining bytes could not
+     * hold at {@code minElementBytes} per element, so a malformed or hostile buffer cannot force a huge allocation.
+     */
+    public static int readBoundedCount(ByteBuf buf, int minElementBytes) {
+        int count = ByteBufCodecs.VAR_INT.decode(buf);
+        if (count < 0 || count > buf.readableBytes() / minElementBytes) {
+            throw new DecoderException("Invalid element count " + count + " with " + buf.readableBytes() + " bytes remaining");
+        }
+        return count;
+    }
+
+    private static void encode(ByteBuf buf, CustomPortal portal) {
+        ByteBufCodecs.STRING_UTF8.encode(buf, portal.frameId);
+        ByteBufCodecs.STRING_UTF8.encode(buf, portal.dimensionId);
+        ByteBufCodecs.VAR_INT.encode(buf, portal.getColorId());
+        BlockPos.STREAM_CODEC.encode(buf, portal.spawnPos);
+        ByteBufCodecs.VAR_INT.encode(buf, portal.portalBlocks.size());
+        for (BlockPos pos : portal.portalBlocks) {
+            BlockPos.STREAM_CODEC.encode(buf, pos);
+        }
+        ByteBufCodecs.FLOAT.encode(buf, portal.offsetX);
+        ByteBufCodecs.FLOAT.encode(buf, portal.offsetZ);
+        ByteBufCodecs.STRING_UTF8.encode(buf, portal.getCreatorIdAsString());
+        ByteBufCodecs.VAR_INT.encode(buf, portal.hasteRunes);
+        ByteBufCodecs.VAR_INT.encode(buf, portal.gateRunes);
+        ByteBufCodecs.VAR_INT.encode(buf, portal.weakEnhancerRunes);
+        ByteBufCodecs.VAR_INT.encode(buf, portal.strongEnhancerRunes);
+        ByteBufCodecs.VAR_INT.encode(buf, portal.infinityRunes);
+    }
+
+    private static CustomPortal decode(ByteBuf buf) {
+        String frameId = ByteBufCodecs.STRING_UTF8.decode(buf);
+        String dimensionId = ByteBufCodecs.STRING_UTF8.decode(buf);
+        int colorId = ByteBufCodecs.VAR_INT.decode(buf);
+        BlockPos spawnPos = BlockPos.STREAM_CODEC.decode(buf);
+        int count = readBoundedCount(buf, Long.BYTES);
+        List<BlockPos> portalBlocks = new ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            portalBlocks.add(BlockPos.STREAM_CODEC.decode(buf));
+        }
+        float offsetX = ByteBufCodecs.FLOAT.decode(buf);
+        float offsetZ = ByteBufCodecs.FLOAT.decode(buf);
+        String creatorId = ByteBufCodecs.STRING_UTF8.decode(buf);
+        int hasteRunes = ByteBufCodecs.VAR_INT.decode(buf);
+        int gateRunes = ByteBufCodecs.VAR_INT.decode(buf);
+        int weakEnhancerRunes = ByteBufCodecs.VAR_INT.decode(buf);
+        int strongEnhancerRunes = ByteBufCodecs.VAR_INT.decode(buf);
+        int infinityRunes = ByteBufCodecs.VAR_INT.decode(buf);
+        return new CustomPortal(frameId, dimensionId, colorId, spawnPos, portalBlocks, offsetX, offsetZ, creatorId,
+                hasteRunes, gateRunes, weakEnhancerRunes, strongEnhancerRunes, infinityRunes);
+    }
+
+    public CustomPortal(final String frameId, final String dimensionId, final MapColor color, final BlockPos spawnPos,
+                        final List<BlockPos> portalBlocks, final float offsetX, final float offsetZ, final UUID creatorId) {
+        this.frameId = frameId;
+        this.dimensionId = dimensionId;
+        this.color = color;
+        this.spawnPos = spawnPos;
+        this.portalBlocks = portalBlocks;
+        this.offsetX = offsetX;
+        this.offsetZ = offsetZ;
+        this.creatorId = creatorId;
+        hasteRunes = 0;
+        gateRunes = 0;
+        weakEnhancerRunes = 0;
+        strongEnhancerRunes = 0;
+        infinityRunes = 0;
+    }
+
+    public float getOffsetX() {
+        return offsetX;
+    }
+
+    public float getOffsetZ() {
+        return offsetZ;
+    }
+
+    public CustomPortal(final String frameId, final String dimensionId, final MapColor color, final BlockPos spawnPos,
+                        final List<BlockPos> portalBlocks, final float offsetX, final float offsetZ, final UUID creatorId, int hasteRunes, int gateRunes,
+                        int weakEnhancerRunes, int strongEnhancerRunes, int infinityRunes) {
+        this.frameId = frameId;
+        this.dimensionId = dimensionId;
+        this.color = color;
+        this.spawnPos = spawnPos;
+        this.portalBlocks = portalBlocks;
+        this.offsetX = offsetX;
+        this.offsetZ = offsetZ;
+        this.creatorId = creatorId;
+        this.hasteRunes = hasteRunes;
+        this.gateRunes = gateRunes;
+        this.weakEnhancerRunes = weakEnhancerRunes;
+        this.strongEnhancerRunes = strongEnhancerRunes;
+        this.infinityRunes = infinityRunes;
+    }
+
+    public CustomPortal(final String frameId, final String dimensionId, final int colorId, final BlockPos spawnPos,
+                        final List<BlockPos> portalBlocks, final float offsetX, final float offsetZ, final String creatorId, int hasteRunes, int gateRunes,
+                        int weakEnhancerRunes, int strongEnhancerRunes, int infinityRunes) {
+        this.frameId = frameId;
+        this.dimensionId = dimensionId;
+        this.color = MapColor.byId(colorId);
+        this.spawnPos = spawnPos;
+        this.portalBlocks = portalBlocks;
+        this.offsetX = offsetX;
+        this.offsetZ = offsetZ;
+        this.creatorId = UUID.fromString(creatorId);
+        this.hasteRunes = hasteRunes;
+        this.gateRunes = gateRunes;
+        this.weakEnhancerRunes = weakEnhancerRunes;
+        this.strongEnhancerRunes = strongEnhancerRunes;
+        this.infinityRunes = infinityRunes;
+    }
+
+    /**
+     * Independent copy of the persisted/synced fields, safe to hand to a packet that may be encoded off-thread.
+     * Runtime-only state ({@code linked}, {@code hasRedstoneSignal}, {@code redstoneChecked}) is not copied.
+     */
+    public CustomPortal snapshot() {
+        return new CustomPortal(frameId, dimensionId, color, spawnPos, List.copyOf(portalBlocks), offsetX, offsetZ,
+                creatorId, hasteRunes, gateRunes, weakEnhancerRunes, strongEnhancerRunes, infinityRunes);
+    }
+
+    public String getFrameId() {
+        return frameId;
+    }
+
+    public String getDimensionId() {
+        return dimensionId;
+    }
+
+    public MapColor getColor() {
+        return color;
+    }
+
+    public int getColorId() { return color.id; }
+
+    public CustomPortal getLinked() {
+        return linked;
+    }
+
+    public BlockPos getSpawnPos() {
+        return spawnPos;
+    }
+
+    public List<BlockPos> getPortalBlocks() {
+        return portalBlocks;
+    }
+
+    public UUID getCreatorId() {
+        return creatorId;
+    }
+
+    public String getCreatorIdAsString() { return creatorId.toString(); }
+
+    public boolean hasLinked() {
+        return linked != null;
+    }
+
+    public boolean isInterdimensional() {
+        return hasLinked() && !dimensionId.equals(linked.getDimensionId());
+    }
+
+    public boolean hasRedstoneSignal() {
+        return hasRedstoneSignal;
+    }
+
+    /** Sets the redstone signal and marks it as checked. */
+    public void setHasRedstoneSignal(boolean hasRedstoneSignal) {
+        this.hasRedstoneSignal = hasRedstoneSignal;
+        this.redstoneChecked = true;
+    }
+
+    /**
+     * Whether the redstone signal has been read from the world since this object was created. It is false after a
+     * load, when the signal is not yet known, so the first block-entity tick re-derives it.
+     */
+    public boolean isRedstoneChecked() {
+        return redstoneChecked;
+    }
+
+    public void setLinked(final CustomPortal portal) {
+        linked = portal;
+    }
+
+    public int getPlayerTeleportDelay() {
+        if (ServicesPMX.CONFIG.portalsAlwaysHaste() == PortalHasteMode.YES)
+            return 1;
+        return this.hasHaste() ? 1 : 80;
+    }
+
+    public void setSpawnPos(BlockPos newSpawn) {
+        spawnPos = newSpawn;
+        offsetX = 0.5f;
+        offsetZ = 0.5f;
+    }
+
+    public int getHasteRunes() { return hasteRunes; }
+    public int getGateRunes() { return gateRunes; }
+    public int getWeakEnhancerRunes() { return weakEnhancerRunes; }
+    public int getStrongEnhancerRunes() { return strongEnhancerRunes; }
+    public int getInfinityRunes() { return infinityRunes; }
+
+    /**
+     * Replaces all five rune counts. Counts are only ever set from a recount of the runes in the world (see
+     * {@link PortalHelper#recountRunes}), never adjusted incrementally, so they cannot drift.
+     */
+    public void setRuneCounts(int hasteRunes, int gateRunes, int weakEnhancerRunes, int strongEnhancerRunes, int infinityRunes) {
+        this.hasteRunes = hasteRunes;
+        this.gateRunes = gateRunes;
+        this.weakEnhancerRunes = weakEnhancerRunes;
+        this.strongEnhancerRunes = strongEnhancerRunes;
+        this.infinityRunes = infinityRunes;
+    }
+
+    public boolean hasHaste() {
+        int i = this.hasLinked() ? linked.getHasteRunes() : 0; 
+        return (hasteRunes + i) > 0;
+    }
+
+    public boolean hasGate() {
+        int i = this.hasLinked() ? linked.getGateRunes() : 0; 
+        return (gateRunes + i) > 0;
+    }
+
+    public int getEnhanceTier() {
+        int i = this.hasLinked() ? linked.getInfinityRunes() : 0;
+        int j = this.hasLinked() ? linked.getStrongEnhancerRunes() : 0;
+        int k = this.hasLinked() ? linked.getWeakEnhancerRunes() : 0;
+        if ((infinityRunes + i) > 0)
+            return 3;
+        if ((strongEnhancerRunes + j) > 0)
+            return 2;
+        if ((weakEnhancerRunes + k) > 0)
+            return 1;
+        return 0;
+    }
+
+    public void tryLink(final CustomPortal portal) {
+        if (ServicesPMX.CONFIG.portalsPrivate() && this.creatorId != null && portal.creatorId != null &&
+                !this.creatorId.equals(portal.getCreatorId())) return;
+        if (portal.getColor() == color && portal.getFrameId().equals(frameId) && portal != this) {
+            if (portal.hasLinked()) {
+                if (portal.getLinked() != this)
+                    return;
+            }
+            if (!ServicesPMX.CONFIG.portalsUnlimitedRange() || !ServicesPMX.CONFIG.portalsAlwaysInterdimensional()) {
+                int distance;
+                if (!portal.getDimensionId().equals(dimensionId)) {
+                    if (!this.hasGate() && !portal.hasGate() && !ServicesPMX.CONFIG.portalsAlwaysInterdimensional())
+                        return;
+                    if (portal.getDimensionId().equals("minecraft:the_nether")) {
+                        int translatedX = portal.getSpawnPos().getX() * 8;
+                        int translatedZ = portal.getSpawnPos().getZ() * 8;
+                        BlockPos translatedSpawnPos = new BlockPos(new Vec3i(
+                                translatedX, portal.getSpawnPos().getY(), translatedZ));
+                        distance = distance(spawnPos, translatedSpawnPos);
+                    } else if (this.dimensionId.equals("minecraft:the_nether")) {
+                        int translatedX = spawnPos.getX() * 8;
+                        int translatedZ = spawnPos.getZ() * 8;
+                        BlockPos translatedSpawnPos = new BlockPos(new Vec3i(
+                                translatedX, spawnPos.getY(), translatedZ));
+                        distance = distance(translatedSpawnPos, portal.getSpawnPos());
+                    } else distance = distance(spawnPos, portal.getSpawnPos());
+                } else distance = distance(spawnPos, portal.getSpawnPos());
+                if (!ServicesPMX.CONFIG.portalsUnlimitedRange()) {
+                    int tier = Math.max(portal.getEnhanceTier(), this.getEnhanceTier());
+                    switch (tier) {
+                        case 0 -> {
+                            if (distance > ServicesPMX.CONFIG.portalsDefaultRange())
+                                return;
+                        }
+                        case 1 -> {
+                            if (distance > ServicesPMX.CONFIG.portalsRangeWithEnhancer())
+                                return;
+                        }
+                        case 2 -> {
+                            if (distance > ServicesPMX.CONFIG.portalsRangeWithStrongEnhancer())
+                                return;
+                        }
+                    }
+                }
+            }
+            linked = portal;
+            portal.setLinked(this);
+        }
+    }
+
+    private int distance(BlockPos pos1, BlockPos pos2) {
+        int x1 = pos1.getX();
+        int x2 = pos2.getX();
+        int y1 = pos1.getY();
+        int y2 = pos2.getY();
+        int z1 = pos1.getZ();
+        int z2 = pos2.getZ();
+        double d = Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2) + Math.pow((z2 - z1), 2));
+        return (int)d;
+    }
+}

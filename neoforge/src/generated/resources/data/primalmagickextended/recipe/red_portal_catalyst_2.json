@@ -1,0 +1,34 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "primalmagickextended:feature_enabled",
+      "feature": "portals"
+    }
+  ],
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "group": "portal_catalyst",
+  "ingredients": [
+    [
+      "primalmagickextended:white_portal_catalyst",
+      "primalmagickextended:orange_portal_catalyst",
+      "primalmagickextended:magenta_portal_catalyst",
+      "primalmagickextended:light_blue_portal_catalyst",
+      "primalmagickextended:yellow_portal_catalyst",
+      "primalmagickextended:lime_portal_catalyst",
+      "primalmagickextended:pink_portal_catalyst",
+      "primalmagickextended:gray_portal_catalyst",
+      "primalmagickextended:light_gray_portal_catalyst",
+      "primalmagickextended:cyan_portal_catalyst",
+      "primalmagickextended:purple_portal_catalyst",
+      "primalmagickextended:blue_portal_catalyst",
+      "primalmagickextended:brown_portal_catalyst",
+      "primalmagickextended:green_portal_catalyst",
+      "primalmagickextended:black_portal_catalyst"
+    ],
+    "minecraft:red_dye"
+  ],
+  "result": {
+    "id": "primalmagickextended:red_portal_catalyst"
+  }
+}

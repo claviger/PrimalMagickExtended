@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.claviger.primalmagickextended.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": ["ServerPlayerMixinNeoforge"],
+  "client": [],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -103,6 +103,72 @@ public class TestInstancesPMX {
     public static final ResourceKey<GameTestInstance> COMMANDS_FAIL_WHEN_THERE_IS_NO_FAMILIAR = createInstanceKey("commands_fail_when_there_is_no_familiar");
     public static final ResourceKey<GameTestInstance> COMMANDS_REQUIRE_GAME_MASTER_PERMISSION_AND_ACCEPT_TARGETS_AND_ALIAS = createInstanceKey("commands_require_game_master_permission_and_accept_targets_and_alias");
 
+    public static final ResourceKey<GameTestInstance> CONFIG_SERVICE_REPORTS_PORTAL_DEFAULTS = createInstanceKey("config_service_reports_portal_defaults");
+    public static final ResourceKey<GameTestInstance> SAME_COLOUR_AND_FRAME_WITHIN_DEFAULT_RANGE_LINK = createInstanceKey("same_colour_and_frame_within_default_range_link");
+    public static final ResourceKey<GameTestInstance> BEYOND_DEFAULT_RANGE_DOES_NOT_LINK = createInstanceKey("beyond_default_range_does_not_link");
+    public static final ResourceKey<GameTestInstance> WEAK_ENHANCER_EXTENDS_RANGE_TO_ONE_THOUSAND = createInstanceKey("weak_enhancer_extends_range_to_one_thousand");
+    public static final ResourceKey<GameTestInstance> STRONG_ENHANCER_EXTENDS_RANGE_TO_TEN_THOUSAND = createInstanceKey("strong_enhancer_extends_range_to_ten_thousand");
+    public static final ResourceKey<GameTestInstance> INFINITY_RUNE_HAS_UNLIMITED_RANGE = createInstanceKey("infinity_rune_has_unlimited_range");
+    public static final ResourceKey<GameTestInstance> DIFFERENT_COLOUR_DOES_NOT_LINK = createInstanceKey("different_colour_does_not_link");
+    public static final ResourceKey<GameTestInstance> DIFFERENT_FRAME_DOES_NOT_LINK = createInstanceKey("different_frame_does_not_link");
+    public static final ResourceKey<GameTestInstance> CROSS_DIMENSION_NEEDS_GATE_RUNE = createInstanceKey("cross_dimension_needs_gate_rune");
+    public static final ResourceKey<GameTestInstance> NETHER_COORDINATES_SCALE_BY_EIGHT = createInstanceKey("nether_coordinates_scale_by_eight");
+    public static final ResourceKey<GameTestInstance> PORTAL_LINKED_ELSEWHERE_IS_NOT_STOLEN = createInstanceKey("portal_linked_elsewhere_is_not_stolen");
+    public static final ResourceKey<GameTestInstance> HASTE_RUNE_SETS_ONE_TICK_DELAY = createInstanceKey("haste_rune_sets_one_tick_delay");
+    public static final ResourceKey<GameTestInstance> REGISTRY_UNREGISTER_RELINKS_PARTNER = createInstanceKey("registry_unregister_relinks_partner");
+    public static final ResourceKey<GameTestInstance> CUSTOM_PORTAL_ROUND_TRIPS_THROUGH_CODEC = createInstanceKey("custom_portal_round_trips_through_codec");
+    public static final ResourceKey<GameTestInstance> CUSTOM_PORTAL_ROUND_TRIPS_THROUGH_STREAM_CODEC = createInstanceKey("custom_portal_round_trips_through_stream_codec");
+    public static final ResourceKey<GameTestInstance> STREAM_DECODING_REJECTS_IMPOSSIBLE_COUNTS = createInstanceKey("stream_decoding_rejects_impossible_counts");
+    public static final ResourceKey<GameTestInstance> SAVED_DATA_RELINKS_PORTALS_ON_LOAD = createInstanceKey("saved_data_relinks_portals_on_load");
+    public static final ResourceKey<GameTestInstance> SYNC_PACKET_ROUND_TRIPS_PORTALS = createInstanceKey("sync_packet_round_trips_portals");
+    public static final ResourceKey<GameTestInstance> PORTAL_DATA_RESOLVES_SERVER_REGISTRY = createInstanceKey("portal_data_resolves_server_registry");
+    public static final ResourceKey<GameTestInstance> PORTAL_BLOCKS_AND_ITEMS_ARE_REGISTERED = createInstanceKey("portal_blocks_and_items_are_registered");
+    public static final ResourceKey<GameTestInstance> RUNE_BLOCKS_AND_ITEMS_ARE_REGISTERED = createInstanceKey("rune_blocks_and_items_are_registered");
+    public static final ResourceKey<GameTestInstance> PORTAL_BLOCK_ENTITY_AND_PARTICLES_ARE_REGISTERED = createInstanceKey("portal_block_entity_and_particles_are_registered");
+    public static final ResourceKey<GameTestInstance> CATALYST_BUILDS_PORTAL_IN_CLOSED_FRAME = createInstanceKey("catalyst_builds_portal_in_closed_frame");
+    public static final ResourceKey<GameTestInstance> CATALYST_FAILS_ON_MIXED_FRAME = createInstanceKey("catalyst_fails_on_mixed_frame");
+    public static final ResourceKey<GameTestInstance> CATALYST_FAILS_ON_OPEN_FRAME = createInstanceKey("catalyst_fails_on_open_frame");
+    public static final ResourceKey<GameTestInstance> TWO_MATCHING_PORTALS_LINK_AND_LIGHT = createInstanceKey("two_matching_portals_link_and_light");
+    public static final ResourceKey<GameTestInstance> PORTALS_OF_DIFFERENT_COLOURS_DO_NOT_LINK = createInstanceKey("portals_of_different_colours_do_not_link");
+    public static final ResourceKey<GameTestInstance> PORTALS_OF_DIFFERENT_FRAMES_DO_NOT_LINK = createInstanceKey("portals_of_different_frames_do_not_link");
+    public static final ResourceKey<GameTestInstance> BREAKING_FRAME_COLLAPSES_PORTAL_AND_DROPS_CATALYST = createInstanceKey("breaking_frame_collapses_portal_and_drops_catalyst");
+    public static final ResourceKey<GameTestInstance> PLACING_AND_BREAKING_RUNE_UPDATES_PORTAL = createInstanceKey("placing_and_breaking_rune_updates_portal");
+    public static final ResourceKey<GameTestInstance> SNEAK_USE_SETS_ARRIVAL_POINT = createInstanceKey("sneak_use_sets_arrival_point");
+    public static final ResourceKey<GameTestInstance> ENTITY_TELEPORTS_THROUGH_LINKED_PORTAL = createInstanceKey("entity_teleports_through_linked_portal");
+    public static final ResourceKey<GameTestInstance> PORTAL_RESEARCH_ENTRIES_HAVE_EXPECTED_STRUCTURE = createInstanceKey("portal_research_entries_have_expected_structure");
+    public static final ResourceKey<GameTestInstance> PORTAL_TRAVEL_IS_OPAQUE = createInstanceKey("portal_travel_is_opaque");
+    public static final ResourceKey<GameTestInstance> CATALYST_RECIPES_ARE_ARCANE_AND_GATED = createInstanceKey("catalyst_recipes_are_arcane_and_gated");
+    public static final ResourceKey<GameTestInstance> RUNE_RECIPES_ARE_ARCANE_AND_GATED = createInstanceKey("rune_recipes_are_arcane_and_gated");
+    public static final ResourceKey<GameTestInstance> RECOLOUR_RECIPES_EXIST_FOR_EVERY_COLOUR = createInstanceKey("recolour_recipes_exist_for_every_colour");
+    public static final ResourceKey<GameTestInstance> NO_VANILLA_RECIPE_CRAFTS_PORTAL_ITEMS_EXCEPT_RECOLOURING = createInstanceKey("no_vanilla_recipe_crafts_portal_items_except_recolouring");
+    public static final ResourceKey<GameTestInstance> RUNE_BLOCK_LOOT_DROPS_RUNE = createInstanceKey("rune_block_loot_drops_rune");
+    public static final ResourceKey<GameTestInstance> RUNE_REMOVED_WITHOUT_PLAYER_UPDATES_COUNT = createInstanceKey("rune_removed_without_player_updates_count");
+    public static final ResourceKey<GameTestInstance> RUNE_SET_BY_COMMAND_IS_COUNTED = createInstanceKey("rune_set_by_command_is_counted");
+    public static final ResourceKey<GameTestInstance> RUNE_RECOUNT_RELINKS_PORTAL = createInstanceKey("rune_recount_relinks_portal");
+    public static final ResourceKey<GameTestInstance> POWERED_PORTAL_STAYS_DARK_AFTER_RELOAD = createInstanceKey("powered_portal_stays_dark_after_reload");
+    public static final ResourceKey<GameTestInstance> FEATURES_ARE_ENABLED_BY_DEFAULT = createInstanceKey("features_are_enabled_by_default");
+    public static final ResourceKey<GameTestInstance> EVERY_FEATURE_RESEARCH_ENTRY_AND_RECIPE_IS_CONDITIONED = createInstanceKey("every_feature_research_entry_and_recipe_is_conditioned");
+    public static final ResourceKey<GameTestInstance> OPAQUE_TAG_REFERENCE_IS_OPTIONAL = createInstanceKey("opaque_tag_reference_is_optional");
+    public static final ResourceKey<GameTestInstance> STALE_RESEARCH_AND_RECIPE_KEYS_ARE_HARMLESS = createInstanceKey("stale_research_and_recipe_keys_are_harmless");
+    public static final ResourceKey<GameTestInstance> STALE_GRIMOIRE_TOPICS_ARE_CLEARED = createInstanceKey("stale_grimoire_topics_are_cleared");
+    public static final ResourceKey<GameTestInstance> FIND_FAMILIAR_PAYLOAD_NEEDS_ITS_ENTRY_LOADED = createInstanceKey("find_familiar_payload_needs_its_entry_loaded");
+
+    // Test functions registered by the NeoForge module (TestFunctionsPMXNeoforge), which this module refers to by name
+    public static final String FEATURE_CONDITION_FOLLOWS_CONFIG_FUNCTION = "feature_condition_follows_config";
+    public static final String FEATURE_CONDITION_KEEPS_ENTRIES_LISTED_BY_SERVER_FUNCTION = "feature_condition_keeps_entries_listed_by_server";
+    public static final String FEATURE_CONDITION_ROUND_TRIPS_THROUGH_CODEC_FUNCTION = "feature_condition_round_trips_through_codec";
+    public static final String CONDITIONED_RESEARCH_ENTRY_LOADS_WHILE_ENABLED_FUNCTION = "conditioned_research_entry_loads_while_enabled";
+    public static final String PLAIN_REGISTRY_OPS_HAVE_NO_CONDITION_CONTEXT_FUNCTION = "plain_registry_ops_have_no_condition_context";
+    public static final String FEATURE_SWITCHES_DEFAULT_TO_ENABLED_FUNCTION = "feature_switches_default_to_enabled";
+    public static final String STALE_RESEARCH_KEY_SURVIVES_SYNC_PACKET_FUNCTION = "stale_research_key_survives_sync_packet";
+    public static final ResourceKey<GameTestInstance> FEATURE_CONDITION_FOLLOWS_CONFIG = createInstanceKey(FEATURE_CONDITION_FOLLOWS_CONFIG_FUNCTION);
+    public static final ResourceKey<GameTestInstance> FEATURE_CONDITION_KEEPS_ENTRIES_LISTED_BY_SERVER = createInstanceKey(FEATURE_CONDITION_KEEPS_ENTRIES_LISTED_BY_SERVER_FUNCTION);
+    public static final ResourceKey<GameTestInstance> FEATURE_CONDITION_ROUND_TRIPS_THROUGH_CODEC = createInstanceKey(FEATURE_CONDITION_ROUND_TRIPS_THROUGH_CODEC_FUNCTION);
+    public static final ResourceKey<GameTestInstance> CONDITIONED_RESEARCH_ENTRY_LOADS_WHILE_ENABLED = createInstanceKey(CONDITIONED_RESEARCH_ENTRY_LOADS_WHILE_ENABLED_FUNCTION);
+    public static final ResourceKey<GameTestInstance> PLAIN_REGISTRY_OPS_HAVE_NO_CONDITION_CONTEXT = createInstanceKey(PLAIN_REGISTRY_OPS_HAVE_NO_CONDITION_CONTEXT_FUNCTION);
+    public static final ResourceKey<GameTestInstance> FEATURE_SWITCHES_DEFAULT_TO_ENABLED = createInstanceKey(FEATURE_SWITCHES_DEFAULT_TO_ENABLED_FUNCTION);
+    public static final ResourceKey<GameTestInstance> STALE_RESEARCH_KEY_SURVIVES_SYNC_PACKET = createInstanceKey(STALE_RESEARCH_KEY_SURVIVES_SYNC_PACKET_FUNCTION);
+
     public static void bootstrap(BootstrapContext<GameTestInstance> context) {
         registerFunction(context, SUMMON_COMMAND_SUMMONS_DISMISSED_FAMILIAR, TestFunctionsPMX.SUMMON_COMMAND_SUMMONS_DISMISSED_FAMILIAR.getKey(), TestUtilsPMX.FLOOR_TEMPLATE);
         registerFunction(context, SUMMON_COMMAND_REFUSES_WHEN_FAMILIAR_IS_ALREADY_IN_PLAY, TestFunctionsPMX.SUMMON_COMMAND_REFUSES_WHEN_FAMILIAR_IS_ALREADY_IN_PLAY.getKey(), TestUtilsPMX.FLOOR_TEMPLATE);
@@ -184,10 +250,71 @@ public class TestInstancesPMX {
         registerFunction(context, RELEASE_REWRITES_QUEUED_SWAPPER_BINDING, TestFunctionsPMX.RELEASE_REWRITES_QUEUED_SWAPPER_BINDING.getKey(), TestUtilsPMX.FLOOR_TEMPLATE);
         registerFunction(context, RELEASE_WITH_UNRESTORABLE_SNAPSHOT_CLEARS_FAMILIAR_AND_ALLOWS_BIND, TestFunctionsPMX.RELEASE_WITH_UNRESTORABLE_SNAPSHOT_CLEARS_FAMILIAR_AND_ALLOWS_BIND.getKey(), TestUtilsPMX.FLOOR_TEMPLATE);
         registerFunction(context, RELEASE_WITH_REFUSED_JOIN_ABORTS_BIND_AND_KEEPS_FAMILIAR, TestFunctionsPMX.RELEASE_WITH_REFUSED_JOIN_ABORTS_BIND_AND_KEEPS_FAMILIAR.getKey(), TestUtilsPMX.FLOOR_TEMPLATE);
+        registerFunction(context, CONFIG_SERVICE_REPORTS_PORTAL_DEFAULTS, TestFunctionsPMX.CONFIG_SERVICE_REPORTS_PORTAL_DEFAULTS.getKey());
+        registerFunction(context, SAME_COLOUR_AND_FRAME_WITHIN_DEFAULT_RANGE_LINK, TestFunctionsPMX.SAME_COLOUR_AND_FRAME_WITHIN_DEFAULT_RANGE_LINK.getKey());
+        registerFunction(context, BEYOND_DEFAULT_RANGE_DOES_NOT_LINK, TestFunctionsPMX.BEYOND_DEFAULT_RANGE_DOES_NOT_LINK.getKey());
+        registerFunction(context, WEAK_ENHANCER_EXTENDS_RANGE_TO_ONE_THOUSAND, TestFunctionsPMX.WEAK_ENHANCER_EXTENDS_RANGE_TO_ONE_THOUSAND.getKey());
+        registerFunction(context, STRONG_ENHANCER_EXTENDS_RANGE_TO_TEN_THOUSAND, TestFunctionsPMX.STRONG_ENHANCER_EXTENDS_RANGE_TO_TEN_THOUSAND.getKey());
+        registerFunction(context, INFINITY_RUNE_HAS_UNLIMITED_RANGE, TestFunctionsPMX.INFINITY_RUNE_HAS_UNLIMITED_RANGE.getKey());
+        registerFunction(context, DIFFERENT_COLOUR_DOES_NOT_LINK, TestFunctionsPMX.DIFFERENT_COLOUR_DOES_NOT_LINK.getKey());
+        registerFunction(context, DIFFERENT_FRAME_DOES_NOT_LINK, TestFunctionsPMX.DIFFERENT_FRAME_DOES_NOT_LINK.getKey());
+        registerFunction(context, CROSS_DIMENSION_NEEDS_GATE_RUNE, TestFunctionsPMX.CROSS_DIMENSION_NEEDS_GATE_RUNE.getKey());
+        registerFunction(context, NETHER_COORDINATES_SCALE_BY_EIGHT, TestFunctionsPMX.NETHER_COORDINATES_SCALE_BY_EIGHT.getKey());
+        registerFunction(context, PORTAL_LINKED_ELSEWHERE_IS_NOT_STOLEN, TestFunctionsPMX.PORTAL_LINKED_ELSEWHERE_IS_NOT_STOLEN.getKey());
+        registerFunction(context, HASTE_RUNE_SETS_ONE_TICK_DELAY, TestFunctionsPMX.HASTE_RUNE_SETS_ONE_TICK_DELAY.getKey());
+        registerFunction(context, REGISTRY_UNREGISTER_RELINKS_PARTNER, TestFunctionsPMX.REGISTRY_UNREGISTER_RELINKS_PARTNER.getKey());
+        registerFunction(context, CUSTOM_PORTAL_ROUND_TRIPS_THROUGH_CODEC, TestFunctionsPMX.CUSTOM_PORTAL_ROUND_TRIPS_THROUGH_CODEC.getKey());
+        registerFunction(context, CUSTOM_PORTAL_ROUND_TRIPS_THROUGH_STREAM_CODEC, TestFunctionsPMX.CUSTOM_PORTAL_ROUND_TRIPS_THROUGH_STREAM_CODEC.getKey());
+        registerFunction(context, STREAM_DECODING_REJECTS_IMPOSSIBLE_COUNTS, TestFunctionsPMX.STREAM_DECODING_REJECTS_IMPOSSIBLE_COUNTS.getKey());
+        registerFunction(context, SAVED_DATA_RELINKS_PORTALS_ON_LOAD, TestFunctionsPMX.SAVED_DATA_RELINKS_PORTALS_ON_LOAD.getKey());
+        registerFunction(context, SYNC_PACKET_ROUND_TRIPS_PORTALS, TestFunctionsPMX.SYNC_PACKET_ROUND_TRIPS_PORTALS.getKey());
+        registerFunction(context, PORTAL_DATA_RESOLVES_SERVER_REGISTRY, TestFunctionsPMX.PORTAL_DATA_RESOLVES_SERVER_REGISTRY.getKey());
+        registerFunction(context, PORTAL_BLOCKS_AND_ITEMS_ARE_REGISTERED, TestFunctionsPMX.PORTAL_BLOCKS_AND_ITEMS_ARE_REGISTERED.getKey());
+        registerFunction(context, RUNE_BLOCKS_AND_ITEMS_ARE_REGISTERED, TestFunctionsPMX.RUNE_BLOCKS_AND_ITEMS_ARE_REGISTERED.getKey());
+        registerFunction(context, PORTAL_BLOCK_ENTITY_AND_PARTICLES_ARE_REGISTERED, TestFunctionsPMX.PORTAL_BLOCK_ENTITY_AND_PARTICLES_ARE_REGISTERED.getKey());
+        registerFunction(context, CATALYST_BUILDS_PORTAL_IN_CLOSED_FRAME, TestFunctionsPMX.CATALYST_BUILDS_PORTAL_IN_CLOSED_FRAME.getKey(), TestUtilsPMX.LARGE_FLOOR_TEMPLATE);
+        registerFunction(context, CATALYST_FAILS_ON_MIXED_FRAME, TestFunctionsPMX.CATALYST_FAILS_ON_MIXED_FRAME.getKey(), TestUtilsPMX.LARGE_FLOOR_TEMPLATE);
+        registerFunction(context, CATALYST_FAILS_ON_OPEN_FRAME, TestFunctionsPMX.CATALYST_FAILS_ON_OPEN_FRAME.getKey(), TestUtilsPMX.LARGE_FLOOR_TEMPLATE);
+        registerFunction(context, TWO_MATCHING_PORTALS_LINK_AND_LIGHT, TestFunctionsPMX.TWO_MATCHING_PORTALS_LINK_AND_LIGHT.getKey(), TestUtilsPMX.LARGE_FLOOR_TEMPLATE);
+        registerFunction(context, PORTALS_OF_DIFFERENT_COLOURS_DO_NOT_LINK, TestFunctionsPMX.PORTALS_OF_DIFFERENT_COLOURS_DO_NOT_LINK.getKey(), TestUtilsPMX.LARGE_FLOOR_TEMPLATE);
+        registerFunction(context, PORTALS_OF_DIFFERENT_FRAMES_DO_NOT_LINK, TestFunctionsPMX.PORTALS_OF_DIFFERENT_FRAMES_DO_NOT_LINK.getKey(), TestUtilsPMX.LARGE_FLOOR_TEMPLATE);
+        registerFunction(context, BREAKING_FRAME_COLLAPSES_PORTAL_AND_DROPS_CATALYST, TestFunctionsPMX.BREAKING_FRAME_COLLAPSES_PORTAL_AND_DROPS_CATALYST.getKey(), TestUtilsPMX.LARGE_FLOOR_TEMPLATE);
+        registerFunction(context, PLACING_AND_BREAKING_RUNE_UPDATES_PORTAL, TestFunctionsPMX.PLACING_AND_BREAKING_RUNE_UPDATES_PORTAL.getKey(), TestUtilsPMX.LARGE_FLOOR_TEMPLATE);
+        registerFunction(context, SNEAK_USE_SETS_ARRIVAL_POINT, TestFunctionsPMX.SNEAK_USE_SETS_ARRIVAL_POINT.getKey(), TestUtilsPMX.LARGE_FLOOR_TEMPLATE);
+        registerFunction(context, ENTITY_TELEPORTS_THROUGH_LINKED_PORTAL, TestFunctionsPMX.ENTITY_TELEPORTS_THROUGH_LINKED_PORTAL.getKey(), TestUtilsPMX.LARGE_FLOOR_TEMPLATE);
+        registerFunction(context, PORTAL_RESEARCH_ENTRIES_HAVE_EXPECTED_STRUCTURE, TestFunctionsPMX.PORTAL_RESEARCH_ENTRIES_HAVE_EXPECTED_STRUCTURE.getKey());
+        registerFunction(context, PORTAL_TRAVEL_IS_OPAQUE, TestFunctionsPMX.PORTAL_TRAVEL_IS_OPAQUE.getKey());
+        registerFunction(context, CATALYST_RECIPES_ARE_ARCANE_AND_GATED, TestFunctionsPMX.CATALYST_RECIPES_ARE_ARCANE_AND_GATED.getKey());
+        registerFunction(context, RUNE_RECIPES_ARE_ARCANE_AND_GATED, TestFunctionsPMX.RUNE_RECIPES_ARE_ARCANE_AND_GATED.getKey());
+        registerFunction(context, RECOLOUR_RECIPES_EXIST_FOR_EVERY_COLOUR, TestFunctionsPMX.RECOLOUR_RECIPES_EXIST_FOR_EVERY_COLOUR.getKey());
+        registerFunction(context, NO_VANILLA_RECIPE_CRAFTS_PORTAL_ITEMS_EXCEPT_RECOLOURING, TestFunctionsPMX.NO_VANILLA_RECIPE_CRAFTS_PORTAL_ITEMS_EXCEPT_RECOLOURING.getKey());
+        registerFunction(context, RUNE_BLOCK_LOOT_DROPS_RUNE, TestFunctionsPMX.RUNE_BLOCK_LOOT_DROPS_RUNE.getKey());
+        registerFunction(context, RUNE_REMOVED_WITHOUT_PLAYER_UPDATES_COUNT, TestFunctionsPMX.RUNE_REMOVED_WITHOUT_PLAYER_UPDATES_COUNT.getKey(), TestUtilsPMX.LARGE_FLOOR_TEMPLATE);
+        registerFunction(context, RUNE_SET_BY_COMMAND_IS_COUNTED, TestFunctionsPMX.RUNE_SET_BY_COMMAND_IS_COUNTED.getKey(), TestUtilsPMX.LARGE_FLOOR_TEMPLATE);
+        registerFunction(context, RUNE_RECOUNT_RELINKS_PORTAL, TestFunctionsPMX.RUNE_RECOUNT_RELINKS_PORTAL.getKey(), TestUtilsPMX.LARGE_FLOOR_TEMPLATE);
+        registerFunction(context, POWERED_PORTAL_STAYS_DARK_AFTER_RELOAD, TestFunctionsPMX.POWERED_PORTAL_STAYS_DARK_AFTER_RELOAD.getKey(), TestUtilsPMX.LARGE_FLOOR_TEMPLATE);
+        registerFunction(context, FEATURES_ARE_ENABLED_BY_DEFAULT, TestFunctionsPMX.FEATURES_ARE_ENABLED_BY_DEFAULT.getKey());
+        registerFunction(context, EVERY_FEATURE_RESEARCH_ENTRY_AND_RECIPE_IS_CONDITIONED, TestFunctionsPMX.EVERY_FEATURE_RESEARCH_ENTRY_AND_RECIPE_IS_CONDITIONED.getKey());
+        registerFunction(context, OPAQUE_TAG_REFERENCE_IS_OPTIONAL, TestFunctionsPMX.OPAQUE_TAG_REFERENCE_IS_OPTIONAL.getKey());
+        registerFunction(context, STALE_RESEARCH_AND_RECIPE_KEYS_ARE_HARMLESS, TestFunctionsPMX.STALE_RESEARCH_AND_RECIPE_KEYS_ARE_HARMLESS.getKey());
+        registerFunction(context, STALE_GRIMOIRE_TOPICS_ARE_CLEARED, TestFunctionsPMX.STALE_GRIMOIRE_TOPICS_ARE_CLEARED.getKey());
+        registerFunction(context, FIND_FAMILIAR_PAYLOAD_NEEDS_ITS_ENTRY_LOADED, TestFunctionsPMX.FIND_FAMILIAR_PAYLOAD_NEEDS_ITS_ENTRY_LOADED.getKey());
+        registerFunction(context, FEATURE_CONDITION_FOLLOWS_CONFIG, functionKey(FEATURE_CONDITION_FOLLOWS_CONFIG_FUNCTION));
+        registerFunction(context, FEATURE_CONDITION_KEEPS_ENTRIES_LISTED_BY_SERVER, functionKey(FEATURE_CONDITION_KEEPS_ENTRIES_LISTED_BY_SERVER_FUNCTION));
+        registerFunction(context, FEATURE_CONDITION_ROUND_TRIPS_THROUGH_CODEC, functionKey(FEATURE_CONDITION_ROUND_TRIPS_THROUGH_CODEC_FUNCTION));
+        registerFunction(context, CONDITIONED_RESEARCH_ENTRY_LOADS_WHILE_ENABLED, functionKey(CONDITIONED_RESEARCH_ENTRY_LOADS_WHILE_ENABLED_FUNCTION));
+        registerFunction(context, PLAIN_REGISTRY_OPS_HAVE_NO_CONDITION_CONTEXT, functionKey(PLAIN_REGISTRY_OPS_HAVE_NO_CONDITION_CONTEXT_FUNCTION));
+        registerFunction(context, FEATURE_SWITCHES_DEFAULT_TO_ENABLED, functionKey(FEATURE_SWITCHES_DEFAULT_TO_ENABLED_FUNCTION));
+        registerFunction(context, STALE_RESEARCH_KEY_SURVIVES_SYNC_PACKET, functionKey(STALE_RESEARCH_KEY_SURVIVES_SYNC_PACKET_FUNCTION));
     }
 
     private static ResourceKey<GameTestInstance> createInstanceKey(String name) {
         return ResourceKey.create(Registries.TEST_INSTANCE, ResourceUtilsPMX.loc(name));
+    }
+
+    /** The key of a test function registered under this mod's namespace by another module. */
+    private static ResourceKey<Consumer<GameTestHelper>> functionKey(String name) {
+        return ResourceKey.create(Registries.TEST_FUNCTION, ResourceUtilsPMX.loc(name));
     }
 
     private static Holder.Reference<GameTestInstance> registerFunction(BootstrapContext<GameTestInstance> context,

@@ -1,4 +1,10 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "primalmagickextended:feature_enabled",
+      "feature": "familiars"
+    }
+  ],
   "type": "primalmagick:ritual",
   "ingredients": [
     "primalmagick:rune_summon",

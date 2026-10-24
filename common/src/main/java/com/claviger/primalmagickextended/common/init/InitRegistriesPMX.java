@@ -1,7 +1,10 @@
 package com.claviger.primalmagickextended.common.init;
 
+import com.claviger.primalmagickextended.client.fx.particles.ParticleTypesPMX;
+import com.claviger.primalmagickextended.common.blocks.BlocksPMX;
 import com.claviger.primalmagickextended.common.items.ItemsPMX;
 import com.claviger.primalmagickextended.common.spells.payloads.SpellPayloadsPMX;
+import com.claviger.primalmagickextended.common.tiles.BlockEntityTypesPMX;
 import com.claviger.primalmagickextended.test.TestFunctionsPMX;
 
 /**
@@ -10,8 +13,11 @@ import com.claviger.primalmagickextended.test.TestFunctionsPMX;
  */
 public class InitRegistriesPMX {
     public static void initDeferredRegistries() {
-        // Holders are added here by later tasks, in dependency order
+        // Blocks must be registered before the items and block entity types that refer to them
+        BlocksPMX.init();
         ItemsPMX.init();
+        BlockEntityTypesPMX.init();
+        ParticleTypesPMX.init();
         SpellPayloadsPMX.init();
         TestFunctionsPMX.init();
     }

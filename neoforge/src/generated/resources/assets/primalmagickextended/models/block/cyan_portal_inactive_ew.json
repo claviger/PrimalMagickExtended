@@ -1,0 +1,6 @@
+{
+  "parent": "primalmagickextended:block/template_custom_portal_ew",
+  "textures": {
+    "portal": "primalmagickextended:block/cyan_portal_inactive"
+  }
+}

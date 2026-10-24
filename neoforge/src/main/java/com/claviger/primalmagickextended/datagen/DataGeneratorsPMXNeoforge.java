@@ -3,15 +3,21 @@ package com.claviger.primalmagickextended.datagen;
 import com.claviger.primalmagickextended.ConstantsPMX;
 import com.claviger.primalmagickextended.datagen.affinities.AffinityProviderPMX;
 import com.claviger.primalmagickextended.datagen.lang.LanguageProviderEnUsPMX;
+import com.claviger.primalmagickextended.datagen.loot_tables.BlockLootTablesPMX;
 import com.claviger.primalmagickextended.datagen.models.ModelProviderPMXNeoforge;
-import com.claviger.primalmagickextended.datagen.recipes.RecipesPMX;
+import com.claviger.primalmagickextended.datagen.particles.ParticleDescriptionProviderPMXNeoforge;
+import com.claviger.primalmagickextended.datagen.recipes.RecipesPMXNeoforge;
 import com.claviger.primalmagickextended.datagen.tags.EntityTypeTagsProviderPMXNeoforge;
+import com.claviger.primalmagickextended.datagen.tags.ResearchEntryTagsProviderPMXNeoforge;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
+import net.minecraft.data.loot.LootTableProvider;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -42,11 +48,15 @@ public class DataGeneratorsPMXNeoforge {
     private static void addClientProviders(GatherDataEvent event, DataGenerator generator, CompletableFuture<HolderLookup.Provider> registryLookupFuture) {
         event.addProvider(new ModelProviderPMXNeoforge(generator.getPackOutput()));
         event.addProvider(new LanguageProviderEnUsPMX(generator.getPackOutput()));
+        event.addProvider(new ParticleDescriptionProviderPMXNeoforge(generator.getPackOutput()));
     }
 
     private static void addServerProviders(GatherDataEvent event, DataGenerator generator, CompletableFuture<HolderLookup.Provider> registryLookupFuture) {
-        event.addProvider(new RecipesPMX.Runner(generator.getPackOutput(), registryLookupFuture));
+        event.addProvider(new RecipesPMXNeoforge.Runner(generator.getPackOutput(), registryLookupFuture));
         event.addProvider(new AffinityProviderPMX(generator.getPackOutput(), registryLookupFuture));
         event.addProvider(new EntityTypeTagsProviderPMXNeoforge(generator.getPackOutput(), registryLookupFuture));
+        event.addProvider(new ResearchEntryTagsProviderPMXNeoforge(generator.getPackOutput(), registryLookupFuture));
+        event.addProvider(new LootTableProvider(generator.getPackOutput(), Collections.emptySet(), List.of(
+                BlockLootTablesPMX.getSubProviderEntry()), registryLookupFuture));
     }
 }

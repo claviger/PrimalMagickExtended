@@ -1,0 +1,6 @@
+{
+  "parent": "primalmagickextended:block/template_portal_rune_full",
+  "textures": {
+    "texture": "primalmagickextended:block/infinity_rune_block"
+  }
+}

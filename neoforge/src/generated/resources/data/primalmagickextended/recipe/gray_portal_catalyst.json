@@ -1,0 +1,38 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "primalmagickextended:feature_enabled",
+      "feature": "portals"
+    }
+  ],
+  "type": "primalmagick:shaped_arcane",
+  "category": "arcane",
+  "expertiseGroup": "primalmagickextended:portal_catalysts",
+  "key": {
+    "#": "primalmagick:essence_shard_infernal",
+    "B": "minecraft:gray_dye",
+    "E": "minecraft:ender_eye",
+    "P": "minecraft:ender_pearl"
+  },
+  "mana": {
+    "sources": {
+      "primalmagick:infernal": 10000
+    }
+  },
+  "pattern": [
+    "#E#",
+    "PBP",
+    "#E#"
+  ],
+  "requirement": {
+    "requirement_type": "primalmagick:research",
+    "rootKey": {
+      "key_type": "primalmagick:research_entry",
+      "rootKey": "primalmagickextended:portal_travel"
+    }
+  },
+  "result": {
+    "count": 2,
+    "id": "primalmagickextended:gray_portal_catalyst"
+  }
+}

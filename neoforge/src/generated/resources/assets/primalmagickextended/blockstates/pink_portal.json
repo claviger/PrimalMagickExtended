@@ -1,0 +1,22 @@
+{
+  "variants": {
+    "axis=x,lit=false": {
+      "model": "primalmagickextended:block/pink_portal_inactive_ns"
+    },
+    "axis=x,lit=true": {
+      "model": "primalmagickextended:block/pink_portal_ns"
+    },
+    "axis=y,lit=false": {
+      "model": "primalmagickextended:block/pink_portal_inactive_ud"
+    },
+    "axis=y,lit=true": {
+      "model": "primalmagickextended:block/pink_portal_ud"
+    },
+    "axis=z,lit=false": {
+      "model": "primalmagickextended:block/pink_portal_inactive_ew"
+    },
+    "axis=z,lit=true": {
+      "model": "primalmagickextended:block/pink_portal_ew"
+    }
+  }
+}

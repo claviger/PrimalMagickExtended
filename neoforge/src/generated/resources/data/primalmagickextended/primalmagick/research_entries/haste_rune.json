@@ -1,0 +1,89 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "primalmagickextended:feature_enabled",
+      "feature": "portals"
+    }
+  ],
+  "addenda": [],
+  "disciplineKey": {
+    "rootKey": "primalmagick:runeworking"
+  },
+  "finales": [],
+  "flags": {
+    "finaleExempt": true
+  },
+  "icon": {
+    "isItem": true,
+    "location": "primalmagickextended:haste_rune"
+  },
+  "key": {
+    "rootKey": "primalmagickextended:haste_rune"
+  },
+  "parents": [
+    {
+      "rootKey": "primalmagick:supreme_runeworking"
+    },
+    {
+      "rootKey": "primalmagickextended:infinity_rune"
+    },
+    {
+      "rootKey": "primalmagick:wand_gem_wizard"
+    },
+    {
+      "rootKey": "primalmagick:discover_void"
+    }
+  ],
+  "stages": [
+    {
+      "completionRequirementOpt": {
+        "requirement_type": "primalmagick:and",
+        "subRequirements": [
+          {
+            "amount": 2,
+            "knowledgeType": "theory",
+            "requirement_type": "primalmagick:knowledge"
+          },
+          {
+            "requirement_type": "primalmagick:item_stack",
+            "stack": {
+              "id": "minecraft:feather"
+            }
+          },
+          {
+            "requirement_type": "primalmagick:item_stack",
+            "stack": {
+              "id": "minecraft:rabbit_foot"
+            }
+          }
+        ]
+      },
+      "parentKey": {
+        "rootKey": "primalmagickextended:haste_rune"
+      },
+      "recipes": [],
+      "revelations": [],
+      "siblings": [],
+      "textTranslationKey": "research.primalmagickextended.haste_rune.text.stage.1"
+    },
+    {
+      "parentKey": {
+        "rootKey": "primalmagickextended:haste_rune"
+      },
+      "recipes": [
+        "primalmagickextended:haste_rune"
+      ],
+      "revelations": [],
+      "rewards": [
+        {
+          "amount": 2,
+          "reward_type": "primalmagick:attunement",
+          "source": "primalmagick:void"
+        }
+      ],
+      "siblings": [],
+      "textTranslationKey": "research.primalmagickextended.haste_rune.text.stage.2"
+    }
+  ],
+  "tier": "primalmagick:supreme"
+}

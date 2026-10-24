@@ -1,0 +1,54 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "primalmagickextended:feature_enabled",
+      "feature": "portals"
+    }
+  ],
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_portal_catalyst": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "primalmagickextended:white_portal_catalyst",
+              "primalmagickextended:orange_portal_catalyst",
+              "primalmagickextended:magenta_portal_catalyst",
+              "primalmagickextended:light_blue_portal_catalyst",
+              "primalmagickextended:yellow_portal_catalyst",
+              "primalmagickextended:lime_portal_catalyst",
+              "primalmagickextended:pink_portal_catalyst",
+              "primalmagickextended:gray_portal_catalyst",
+              "primalmagickextended:light_gray_portal_catalyst",
+              "primalmagickextended:cyan_portal_catalyst",
+              "primalmagickextended:purple_portal_catalyst",
+              "primalmagickextended:blue_portal_catalyst",
+              "primalmagickextended:brown_portal_catalyst",
+              "primalmagickextended:red_portal_catalyst",
+              "primalmagickextended:black_portal_catalyst"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "primalmagickextended:green_portal_catalyst_2"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_portal_catalyst"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "primalmagickextended:green_portal_catalyst_2"
+    ]
+  }
+}

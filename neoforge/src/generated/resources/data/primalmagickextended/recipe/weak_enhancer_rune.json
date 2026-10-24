@@ -1,0 +1,33 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "primalmagickextended:feature_enabled",
+      "feature": "portals"
+    }
+  ],
+  "type": "primalmagick:shaped_arcane",
+  "category": "arcane",
+  "key": {
+    "#": "minecraft:lapis_lazuli",
+    "A": "minecraft:amethyst_shard"
+  },
+  "mana": {
+    "sources": {
+      "primalmagick:infernal": 25000
+    }
+  },
+  "pattern": [
+    "###",
+    "#A "
+  ],
+  "requirement": {
+    "requirement_type": "primalmagick:research",
+    "rootKey": {
+      "key_type": "primalmagick:research_entry",
+      "rootKey": "primalmagickextended:weak_enhancer_rune"
+    }
+  },
+  "result": {
+    "id": "primalmagickextended:weak_enhancer_rune"
+  }
+}

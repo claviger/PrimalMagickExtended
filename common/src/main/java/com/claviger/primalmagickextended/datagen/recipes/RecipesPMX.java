@@ -1,30 +1,36 @@
 package com.claviger.primalmagickextended.datagen.recipes;
 
-import com.claviger.primalmagickextended.ConstantsPMX;
+import com.claviger.primalmagickextended.common.features.FeaturePMX;
 import com.claviger.primalmagickextended.common.items.ItemsPMX;
+import com.claviger.primalmagickextended.common.portals.PortalColor;
 import com.claviger.primalmagickextended.common.research.ResearchEntriesPMX;
+import com.claviger.primalmagickextended.common.util.ResourceUtilsPMX;
 import com.verdantartifice.primalmagick.common.blocks.BlocksPM;
 import com.verdantartifice.primalmagick.common.items.ItemsPM;
 import com.verdantartifice.primalmagick.common.sources.SourceList;
 import com.verdantartifice.primalmagick.common.sources.Sources;
 import com.verdantartifice.primalmagick.common.tags.CommonTags;
+import com.verdantartifice.primalmagick.datagen.recipes.ArcaneShapedRecipeBuilder;
 import com.verdantartifice.primalmagick.datagen.recipes.RitualRecipeBuilder;
+import net.minecraft.advancements.criterion.InventoryChangeTrigger;
+import net.minecraft.advancements.criterion.ItemPredicate;
 import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.PackOutput;
+import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.concurrent.CompletableFuture;
 
 /**
  * Recipe data provider for the mod. Uses Primal Magick's ritual recipe builder; recipe ids take this
- * mod's namespace because they are derived from the result item.
+ * mod's namespace because they are derived from the result item. Every recipe belongs to a feature and is
+ * written through {@link #featureOutput(FeaturePMX)}, so that the platform can make it load only while
+ * that feature is turned on.
  */
 public class RecipesPMX extends RecipeProvider {
     // Vanilla RecipeProvider.items is private outside Primal Magick's access transformer, so the common module keeps its own lookup
@@ -37,9 +43,18 @@ public class RecipesPMX extends RecipeProvider {
         this.blocks = registries.lookupOrThrow(Registries.BLOCK);
     }
 
+    /**
+     * The output for the recipes of a feature, and their unlock advancements. Load conditions are a platform
+     * feature, so this returns the plain output and the NeoForge subclass attaches the feature's condition.
+     */
+    protected RecipeOutput featureOutput(FeaturePMX feature) {
+        return this.output;
+    }
+
     @Override
     protected void buildRecipes() {
         this.registerFamiliarRecipes();
+        this.registerPortalRecipes();
     }
 
     protected void registerFamiliarRecipes() {
@@ -55,27 +70,90 @@ public class RecipesPMX extends RecipeProvider {
                 .requiredResearch(ResearchEntriesPMX.FAMILIAR_COLLAR)
                 .manaCost(SourceList.EMPTY.add(Sources.BLOOD, 20).add(Sources.INFERNAL, 20))
                 .instability(3)
-                .build(this.output);
+                .build(this.featureOutput(FeaturePMX.FAMILIARS));
     }
 
     /**
-     * Datagen runner for the recipe provider.
+     * Registers the portal catalyst and rune recipes, ported from the datapack with mana in whole mana. Catalysts and
+     * runes are crafted only at the arcane workbench; the one vanilla recipe per colour recolours an existing catalyst.
      */
-    public static class Runner extends RecipeProvider.Runner {
-        public Runner(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
-            super(packOutput, registries);
+    protected void registerPortalRecipes() {
+        RecipeOutput output = this.featureOutput(FeaturePMX.PORTALS);
+        for (PortalColor color : PortalColor.values()) {
+            Item catalyst = ItemsPMX.catalyst(color);
+            Item dye = color.dyeItem();
+            // One shared expertise group, so crafting all sixteen colours grants expertise once rather than sixteen times
+            ArcaneShapedRecipeBuilder.arcaneShapedRecipe(this.itemGetter, catalyst, 2)
+                    .patternLine("#E#")
+                    .patternLine("PBP")
+                    .patternLine("#E#")
+                    .key('#', ItemsPM.ESSENCE_SHARD_INFERNAL.get())
+                    .key('E', Items.ENDER_EYE)
+                    .key('P', Items.ENDER_PEARL)
+                    .key('B', dye)
+                    .requiredResearch(ResearchEntriesPMX.PORTAL_TRAVEL)
+                    .manaCost(SourceList.EMPTY.add(Sources.INFERNAL, 100))
+                    .expertiseGroup(ResourceUtilsPMX.loc("portal_catalysts"))
+                    .build(output);
+
+            Item[] otherCatalysts = ItemsPMX.catalysts().stream().filter(other -> other != catalyst).toArray(Item[]::new);
+            // Unlocks on owning any catalyst that this recipe can recolour. A single predicate over all fifteen items
+            // matches any of them; one predicate per item would require all of them.
+            this.shapeless(RecipeCategory.MISC, catalyst)
+                    .requires(Ingredient.of(otherCatalysts))
+                    .requires(dye)
+                    .group("portal_catalyst")
+                    .unlockedBy("has_portal_catalyst", InventoryChangeTrigger.TriggerInstance.hasItems(ItemPredicate.Builder.item().of(this.itemGetter, otherCatalysts)))
+                    .save(output, ResourceKey.create(Registries.RECIPE, ResourceUtilsPMX.loc(color.getSerializedName() + "_portal_catalyst_2")));
         }
 
-        @Override
-        @NotNull
-        protected RecipeProvider createRecipeProvider(@NotNull HolderLookup.Provider provider, @NotNull RecipeOutput recipeOutput) {
-            return new RecipesPMX(provider, recipeOutput);
-        }
-
-        @Override
-        @NotNull
-        public String getName() {
-            return ConstantsPMX.MOD_NAME + " Recipes";
-        }
+        ArcaneShapedRecipeBuilder.arcaneShapedRecipe(this.itemGetter, ItemsPMX.WEAK_ENHANCER_RUNE.get())
+                .patternLine("###")
+                .patternLine("#A ")
+                .key('#', Items.LAPIS_LAZULI)
+                .key('A', Items.AMETHYST_SHARD)
+                .requiredResearch(ResearchEntriesPMX.WEAK_ENHANCER_RUNE)
+                .manaCost(SourceList.EMPTY.add(Sources.INFERNAL, 250))
+                .build(output);
+        ArcaneShapedRecipeBuilder.arcaneShapedRecipe(this.itemGetter, ItemsPMX.STRONG_ENHANCER_RUNE.get())
+                .patternLine(" # ")
+                .patternLine("PW#")
+                .patternLine("#P ")
+                .key('#', Items.PRISMARINE_SHARD)
+                .key('P', Items.PRISMARINE_CRYSTALS)
+                .key('W', ItemsPMX.WEAK_ENHANCER_RUNE.get())
+                .requiredResearch(ResearchEntriesPMX.STRONG_ENHANCER_RUNE)
+                .manaCost(SourceList.EMPTY.add(Sources.INFERNAL, 750))
+                .build(output);
+        ArcaneShapedRecipeBuilder.arcaneShapedRecipe(this.itemGetter, ItemsPMX.INFINITY_RUNE.get())
+                .patternLine("#PP")
+                .patternLine("PnP")
+                .patternLine("PP#")
+                .key('#', ItemsPMX.STRONG_ENHANCER_RUNE.get())
+                .key('P', Items.POPPED_CHORUS_FRUIT)
+                .key('n', Items.NETHERITE_INGOT)
+                .requiredResearch(ResearchEntriesPMX.INFINITY_RUNE)
+                .manaCost(SourceList.EMPTY.add(Sources.VOID, 750).add(Sources.INFERNAL, 750))
+                .build(output);
+        ArcaneShapedRecipeBuilder.arcaneShapedRecipe(this.itemGetter, ItemsPMX.GATE_RUNE.get())
+                .patternLine("##T")
+                .patternLine("#A#")
+                .patternLine("T##")
+                .key('#', Items.WEEPING_VINES)
+                .key('T', Items.POPPED_CHORUS_FRUIT)
+                .key('A', Items.AMETHYST_SHARD)
+                .requiredResearch(ResearchEntriesPMX.GATE_RUNE)
+                .manaCost(SourceList.EMPTY.add(Sources.VOID, 750))
+                .build(output);
+        ArcaneShapedRecipeBuilder.arcaneShapedRecipe(this.itemGetter, ItemsPMX.HASTE_RUNE.get())
+                .patternLine("#  ")
+                .patternLine("#R#")
+                .patternLine(" A#")
+                .key('#', Items.FEATHER)
+                .key('R', Items.RABBIT_FOOT)
+                .key('A', Items.AMETHYST_SHARD)
+                .requiredResearch(ResearchEntriesPMX.HASTE_RUNE)
+                .manaCost(SourceList.EMPTY.add(Sources.VOID, 750).add(Sources.INFERNAL, 750))
+                .build(output);
     }
 }

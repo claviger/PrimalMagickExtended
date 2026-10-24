@@ -1,0 +1,36 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "primalmagickextended:feature_enabled",
+      "feature": "portals"
+    }
+  ],
+  "type": "primalmagick:shaped_arcane",
+  "category": "arcane",
+  "key": {
+    "#": "primalmagickextended:strong_enhancer_rune",
+    "P": "minecraft:popped_chorus_fruit",
+    "n": "minecraft:netherite_ingot"
+  },
+  "mana": {
+    "sources": {
+      "primalmagick:infernal": 75000,
+      "primalmagick:void": 75000
+    }
+  },
+  "pattern": [
+    "#PP",
+    "PnP",
+    "PP#"
+  ],
+  "requirement": {
+    "requirement_type": "primalmagick:research",
+    "rootKey": {
+      "key_type": "primalmagick:research_entry",
+      "rootKey": "primalmagickextended:infinity_rune"
+    }
+  },
+  "result": {
+    "id": "primalmagickextended:infinity_rune"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "primalmagickextended:feature_enabled",
+      "feature": "portals"
+    }
+  ],
+  "type": "primalmagick:shaped_arcane",
+  "category": "arcane",
+  "key": {
+    "#": "minecraft:feather",
+    "A": "minecraft:amethyst_shard",
+    "R": "minecraft:rabbit_foot"
+  },
+  "mana": {
+    "sources": {
+      "primalmagick:infernal": 75000,
+      "primalmagick:void": 75000
+    }
+  },
+  "pattern": [
+    "#  ",
+    "#R#",
+    " A#"
+  ],
+  "requirement": {
+    "requirement_type": "primalmagick:research",
+    "rootKey": {
+      "key_type": "primalmagick:research_entry",
+      "rootKey": "primalmagickextended:haste_rune"
+    }
+  },
+  "result": {
+    "id": "primalmagickextended:haste_rune"
+  }
+}

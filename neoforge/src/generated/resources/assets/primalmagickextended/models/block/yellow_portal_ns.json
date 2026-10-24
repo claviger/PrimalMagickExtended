@@ -1,0 +1,6 @@
+{
+  "parent": "primalmagickextended:block/template_custom_portal_ns",
+  "textures": {
+    "portal": "primalmagickextended:block/yellow_portal"
+  }
+}

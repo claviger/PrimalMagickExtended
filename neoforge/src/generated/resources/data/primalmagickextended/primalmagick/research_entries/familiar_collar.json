@@ -1,4 +1,10 @@
 {
+  "neoforge:conditions": [
+    {
+      "type": "primalmagickextended:feature_enabled",
+      "feature": "familiars"
+    }
+  ],
   "addenda": [],
   "disciplineKey": {
     "rootKey": "primalmagick:ritual"

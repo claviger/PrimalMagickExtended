@@ -1,0 +1,35 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "primalmagickextended:feature_enabled",
+      "feature": "portals"
+    }
+  ],
+  "type": "primalmagick:shaped_arcane",
+  "category": "arcane",
+  "key": {
+    "#": "minecraft:prismarine_shard",
+    "P": "minecraft:prismarine_crystals",
+    "W": "primalmagickextended:weak_enhancer_rune"
+  },
+  "mana": {
+    "sources": {
+      "primalmagick:infernal": 75000
+    }
+  },
+  "pattern": [
+    " # ",
+    "PW#",
+    "#P "
+  ],
+  "requirement": {
+    "requirement_type": "primalmagick:research",
+    "rootKey": {
+      "key_type": "primalmagick:research_entry",
+      "rootKey": "primalmagickextended:strong_enhancer_rune"
+    }
+  },
+  "result": {
+    "id": "primalmagickextended:strong_enhancer_rune"
+  }
+}

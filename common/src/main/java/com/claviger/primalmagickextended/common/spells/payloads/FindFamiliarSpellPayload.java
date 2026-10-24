@@ -3,8 +3,11 @@ package com.claviger.primalmagickextended.common.spells.payloads;
 import com.claviger.primalmagickextended.ConstantsPMX;
 import com.claviger.primalmagickextended.common.familiars.FamiliarManager;
 import com.claviger.primalmagickextended.common.research.ResearchEntriesPMX;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableList;
 import com.mojang.serialization.MapCodec;
+import com.verdantartifice.primalmagick.common.registries.RegistryKeysPM;
+import com.verdantartifice.primalmagick.common.research.ResearchEntry;
 import com.verdantartifice.primalmagick.common.research.keys.ResearchEntryKey;
 import com.verdantartifice.primalmagick.common.research.requirements.AbstractRequirement;
 import com.verdantartifice.primalmagick.common.research.requirements.ResearchRequirement;
@@ -20,11 +23,13 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
@@ -50,11 +55,26 @@ public class FindFamiliarSpellPayload extends AbstractSpellPayload<FindFamiliarS
     public static final StreamCodec<ByteBuf, FindFamiliarSpellPayload> STREAM_CODEC = StreamCodec.unit(FindFamiliarSpellPayload.INSTANCE);
 
     public static final String TYPE = "find_familiar";
-    protected static final AbstractRequirement<?> REQUIREMENT = new ResearchRequirement(new ResearchEntryKey(ResearchEntriesPMX.FIND_FAMILIAR));
+    protected static final AbstractRequirement<?> REQUIREMENT = loadedResearch(ResearchEntriesPMX.FIND_FAMILIAR);
     protected static final int BASE_MANA_COST = 20;
 
     public static AbstractRequirement<?> getRequirement() {
         return REQUIREMENT;
+    }
+
+    /**
+     * A requirement met by players who know the given research while its entry is loaded. A player who researched
+     * Find Familiar before familiars were turned off still knows its key, so knowing the research alone would keep
+     * offering the payload once the entry is gone.
+     */
+    @VisibleForTesting
+    public static AbstractRequirement<?> loadedResearch(ResourceKey<ResearchEntry> entry) {
+        return new ResearchRequirement(new ResearchEntryKey(entry)) {
+            @Override
+            public boolean isMetBy(Player player) {
+                return super.isMetBy(player) && player.registryAccess().lookupOrThrow(RegistryKeysPM.RESEARCH_ENTRIES).containsKey(entry);
+            }
+        };
     }
 
     public static FindFamiliarSpellPayload getInstance() {

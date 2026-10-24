@@ -1,0 +1,88 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "primalmagickextended:feature_enabled",
+      "feature": "portals"
+    }
+  ],
+  "addenda": [],
+  "disciplineKey": {
+    "rootKey": "primalmagick:runeworking"
+  },
+  "finales": [],
+  "flags": {
+    "finaleExempt": true
+  },
+  "icon": {
+    "isItem": true,
+    "location": "primalmagickextended:strong_enhancer_rune"
+  },
+  "key": {
+    "rootKey": "primalmagickextended:strong_enhancer_rune"
+  },
+  "parents": [
+    {
+      "rootKey": "primalmagick:master_runeworking"
+    },
+    {
+      "rootKey": "primalmagickextended:weak_enhancer_rune"
+    },
+    {
+      "rootKey": "primalmagick:wand_gem_wizard"
+    }
+  ],
+  "stages": [
+    {
+      "completionRequirementOpt": {
+        "requirement_type": "primalmagick:and",
+        "subRequirements": [
+          {
+            "amount": 2,
+            "knowledgeType": "theory",
+            "requirement_type": "primalmagick:knowledge"
+          },
+          {
+            "requirement_type": "primalmagick:item_stack",
+            "stack": {
+              "count": 2,
+              "id": "minecraft:prismarine_shard"
+            }
+          },
+          {
+            "requirement_type": "primalmagick:item_stack",
+            "stack": {
+              "count": 2,
+              "id": "minecraft:prismarine_crystals"
+            }
+          }
+        ]
+      },
+      "parentKey": {
+        "rootKey": "primalmagickextended:strong_enhancer_rune"
+      },
+      "recipes": [],
+      "revelations": [],
+      "siblings": [],
+      "textTranslationKey": "research.primalmagickextended.strong_enhancer_rune.text.stage.1"
+    },
+    {
+      "parentKey": {
+        "rootKey": "primalmagickextended:strong_enhancer_rune"
+      },
+      "recipes": [
+        "primalmagickextended:strong_enhancer_rune"
+      ],
+      "revelations": [],
+      "rewards": [
+        {
+          "amount": 2,
+          "reward_type": "primalmagick:attunement",
+          "source": "primalmagick:infernal"
+        }
+      ],
+      "siblings": [],
+      "textTranslationKey": "research.primalmagickextended.strong_enhancer_rune.text.stage.2"
+    }
+  ],
+  "tier": "primalmagick:master"
+}

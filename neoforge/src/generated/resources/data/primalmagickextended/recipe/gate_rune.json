@@ -1,0 +1,35 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "primalmagickextended:feature_enabled",
+      "feature": "portals"
+    }
+  ],
+  "type": "primalmagick:shaped_arcane",
+  "category": "arcane",
+  "key": {
+    "#": "minecraft:weeping_vines",
+    "A": "minecraft:amethyst_shard",
+    "T": "minecraft:popped_chorus_fruit"
+  },
+  "mana": {
+    "sources": {
+      "primalmagick:void": 75000
+    }
+  },
+  "pattern": [
+    "##T",
+    "#A#",
+    "T##"
+  ],
+  "requirement": {
+    "requirement_type": "primalmagick:research",
+    "rootKey": {
+      "key_type": "primalmagick:research_entry",
+      "rootKey": "primalmagickextended:gate_rune"
+    }
+  },
+  "result": {
+    "id": "primalmagickextended:gate_rune"
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "primalmagickextended:feature_enabled",
+      "feature": "portals"
+    }
+  ],
+  "addenda": [],
+  "disciplineKey": {
+    "rootKey": "primalmagick:runeworking"
+  },
+  "finales": [],
+  "flags": {
+    "finaleExempt": true
+  },
+  "icon": {
+    "isItem": true,
+    "location": "primalmagickextended:gate_rune"
+  },
+  "key": {
+    "rootKey": "primalmagickextended:gate_rune"
+  },
+  "parents": [
+    {
+      "rootKey": "primalmagick:master_runeworking"
+    },
+    {
+      "rootKey": "primalmagickextended:strong_enhancer_rune"
+    },
+    {
+      "rootKey": "primalmagick:wand_gem_wizard"
+    },
+    {
+      "rootKey": "primalmagick:discover_void"
+    },
+    {
+      "rootKey": "primalmagick:discover_infernal"
+    }
+  ],
+  "stages": [
+    {
+      "completionRequirementOpt": {
+        "requirement_type": "primalmagick:and",
+        "subRequirements": [
+          {
+            "amount": 2,
+            "knowledgeType": "theory",
+            "requirement_type": "primalmagick:knowledge"
+          },
+          {
+            "requirement_type": "primalmagick:item_stack",
+            "stack": {
+              "count": 2,
+              "id": "minecraft:weeping_vines"
+            }
+          },
+          {
+            "requirement_type": "primalmagick:item_stack",
+            "stack": {
+              "count": 2,
+              "id": "minecraft:popped_chorus_fruit"
+            }
+          }
+        ]
+      },
+      "parentKey": {
+        "rootKey": "primalmagickextended:gate_rune"
+      },
+      "recipes": [],
+      "revelations": [],
+      "siblings": [],
+      "textTranslationKey": "research.primalmagickextended.gate_rune.text.stage.1"
+    },
+    {
+      "parentKey": {
+        "rootKey": "primalmagickextended:gate_rune"
+      },
+      "recipes": [
+        "primalmagickextended:gate_rune"
+      ],
+      "revelations": [],
+      "rewards": [
+        {
+          "amount": 2,
+          "reward_type": "primalmagick:attunement",
+          "source": "primalmagick:void"
+        }
+      ],
+      "siblings": [],
+      "textTranslationKey": "research.primalmagickextended.gate_rune.text.stage.2"
+    }
+  ],
+  "tier": "primalmagick:supreme"
+}
