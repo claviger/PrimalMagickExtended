@@ -4,7 +4,7 @@ An add-on for [Primal Magick](https://github.com/daedalus4096/PrimalMagick) on M
 It requires Primal Magick and extends it; Primal Magick itself is never modified.
 
 This branch (`mc/1.21.1`) is the Minecraft 1.21.1 version, built against the official Primal Magick 6.0.7 release.
-The Minecraft 26.1.2 version, which targets the 26.1 port of Primal Magick, lives on the `main` branch.
+The Minecraft 26.1.2 version, which will targets the upcoming 26.1 port of Primal Magick, lives on the `main` branch.
 
 ## Requirements
 
