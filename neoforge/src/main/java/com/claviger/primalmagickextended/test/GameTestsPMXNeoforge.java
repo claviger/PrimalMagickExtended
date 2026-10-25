@@ -27,7 +27,8 @@ public class GameTestsPMXNeoforge {
                         FamiliarTestsPMXNeoforge.entries(),
                         PortalTestsPMX.entries(),
                         FeatureTestsPMX.entries(),
-                        FeatureTestsPMXNeoforge.entries())
+                        FeatureTestsPMXNeoforge.entries(),
+                        AffinityTestsPMX.entries())
                 .flatMap(List::stream)
                 .toList();
 

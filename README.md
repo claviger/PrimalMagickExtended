@@ -17,9 +17,13 @@ The Minecraft 26.1.2 version, which will targets the upcoming 26.1 port of Prima
 
 ### Differences from the 26.1 version
 
-The features are the same as in 0.2.0 on Minecraft 26.1, except:
+The features are the same as in 0.3.0 on Minecraft 26.1, except:
 - Nautiluses and zombie nautiluses do not exist in Minecraft 1.21.1, so they cannot be familiars.
 - Portal data is saved in the world's `data/primalmagickextended_portals.dat`.
+- Primal Magick 6.0.7 covers every natural block of Minecraft 1.21.1, so Generated Affinities only fills in blocks
+  of other mods.
+- Primal Magick 6.0.7 sends affinities to players as they join, so after a `/reload` players already online keep the
+  affinities they had until they rejoin, as with Primal Magick's own affinities.
 
 ## Features
 
@@ -91,6 +95,31 @@ LAN-hosted world.
 Everything is documented in the Grimoire: Portal Travel under Manaweaving, and the five rune entries under
 Runeworking once Portal Travel is known.
 
+### Generated Affinities
+Blocks added by biome mods (Biomes O' Plenty, Terralith and the like) have no Primal Magick affinity, so they
+break down to nothing. Whenever the server loads its data (at start-up and on `/reload`), every block item that has
+no affinity and no recipe gets one worked out from what it is and where world generation puts it, and Primal Magick
+treats it like one from a data pack. Crafted blocks made from these (planks, slabs of sandstone, ...) then get
+affinities through Primal Magick's usual recipe scan.
+- **What it is** picks a vanilla block to start from: block tags (`#minecraft:logs`, `#minecraft:leaves`,
+  `#minecraft:sand`, ...), then the block's class, then how world generation uses it (tree trunk, foliage, ground),
+  then its name. A redwood log starts from the oak log, a new flower from the dandelion.
+- **Where it generates** adjusts that: Nether plants lose sun and gain infernal and moon, End plants gain void and
+  moon, cave plants trade sun for moon, plants in or by water gain sea, and biome tags of the biomes it generates in
+  add sea (ocean, river, beach, swamp), sun (desert, badlands, savanna, dry), sky (snowy, icy, mountain) or moon
+  (spooky, dead, mushroom, magical).
+- Saplings and other items dropped by worldgen blocks, stripped logs, and buckets of worldgen fluids follow their
+  source.
+- Crafted blocks made from these whose recipe share rounds down to nothing (slabs, buttons, stairs of a weak
+  material) get 1 of each source of their ingredients instead, as Primal Magick's own data does for the oak slab.
+- An affinity from a data pack always wins; generated ones only fill gaps.
+- Primal Magick's `/pm affinities lint` and `/pm affinities generateDatapack` still list items whose only affinity
+  is a generated one, since those are what a data pack still needs to cover, and `/pm affinities explain` says when
+  an item's affinity is generated.
+- Each run writes a report of every generated affinity and the reasons for it to
+  `primalmagickextended/generated_affinities.md` in the game (or server) directory, and the entries in Primal Magick's
+  data pack format to `generated_affinities.json` beside it, ready to copy into a data pack and adjust.
+
 ### Commands
 Game master permission, usable from the console. `[players]` defaults to whoever runs the command, so from
 the console a player must be named. `/pmx` is an alias for `/primalmagickextended`.
@@ -102,16 +131,18 @@ the console a player must be named. `/pmx` is an alias for `/primalmagickextende
 
 ### Configuration
 Whole features can be turned off in the `[features]` section of `config/primalmagickextended-common.toml`, which
-applies to the whole installation (every world, and the server on a dedicated server). Both are on by default:
+applies to the whole installation (every world, and the server on a dedicated server). All are on by default:
 
 ```toml
 [features]
 	familiars = true
 	portals = true
+	generated_affinities = true
 ```
 
 - `familiars`: the Familiar Collar ritual and the Find Familiar spell.
 - `portals`: Portal Travel, the portal catalysts and the five portal runes.
+- `generated_affinities`: affinities worked out for natural blocks that have none (see Generated Affinities).
 
 A disabled feature's Grimoire entries and recipes are not loaded: they do not appear in the Grimoire (not even as
 upcoming research or on other entries' pages) or in the Arcane Workbench or crafting table recipe books, even for
@@ -119,6 +150,7 @@ players who had researched them, and the Find Familiar spell is no longer offere
 Changes take effect after restarting the game or server. Turning a feature off does not remove anything already in a
 world: its blocks, items and creatures stay registered, keep working, and remain available from the creative menu
 and `/give`. On a dedicated server, the server's setting applies to every player.
+Turning off `generated_affinities` stops the generation; blocks that only had a generated affinity have none again.
 
 ## Credits
 
